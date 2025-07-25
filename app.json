@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "隨便吃！",
+    "slug": "whatevereats",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF6F3C"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.whatevereats"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF6F3C"
+      },
+      "package": "com.yourcompany.whatevereats"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
