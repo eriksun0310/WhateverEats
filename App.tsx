@@ -4,7 +4,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider, useSelector } from 'react-redux';
 import { store, RootState } from './src/store';
-import { Dices, Search, MapPin, User } from 'lucide-react-native';
+import { Dices, Search, MapPin, User, Settings } from 'lucide-react-native';
+import { TouchableOpacity } from 'react-native';
 
 import SpinScreen from './src/screens/SpinScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -12,6 +13,7 @@ import MapScreen from './src/screens/MapScreen';
 import MyScreen from './src/screens/MyScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 import { theme } from './src/constants/theme';
 
 const Tab = createBottomTabNavigator();
@@ -73,12 +75,20 @@ function MainTabs() {
       <Tab.Screen
         name="My"
         component={MyScreen}
-        options={{
+        options={({ navigation }) => ({
           title: '我的',
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} />
           ),
-        }}
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Settings' as never)}
+              style={{ marginRight: theme.spacing.md }}
+            >
+              <Settings size={24} color={theme.colors.surface} />
+            </TouchableOpacity>
+          ),
+        })}
       />
     </Tab.Navigator>
   );
@@ -91,7 +101,24 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (
-        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen 
+            name="Settings" 
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              title: '設定',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+        </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
