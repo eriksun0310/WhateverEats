@@ -10,21 +10,23 @@ import { Restaurant } from '../types/restaurant';
 
 export default function SpinScreen() {
   const dispatch = useDispatch<AppDispatch>();
-  const { restaurants, blacklist, favorites, filters } = useSelector(
+  const { restaurants, blacklist, favorites, wheelList } = useSelector(
     (state: RootState) => state.restaurant
   );
   
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const [spinMode, setSpinMode] = useState<'all' | 'favorites'>('all');
+  const [spinMode, setSpinMode] = useState<'wheelList' | 'favorites'>('wheelList');
 
   // 根據模式取得可用餐廳
   const getAvailableRestaurants = () => {
     let pool = restaurants;
     
     // 根據模式篩選
-    if (spinMode === 'favorites') {
+    if (spinMode === 'wheelList') {
+      pool = restaurants.filter(r => wheelList.includes(r.id));
+    } else if (spinMode === 'favorites') {
       pool = restaurants.filter(r => favorites.includes(r.id));
     }
     
@@ -89,14 +91,14 @@ export default function SpinScreen() {
         <TouchableOpacity
           style={[
             styles.modeButton,
-            spinMode === 'all' && styles.modeButtonActive
+            spinMode === 'wheelList' && styles.modeButtonActive
           ]}
-          onPress={() => setSpinMode('all')}
+          onPress={() => setSpinMode('wheelList')}
         >
           <Text style={[
             styles.modeButtonText,
-            spinMode === 'all' && styles.modeButtonTextActive
-          ]}>全部餐廳</Text>
+            spinMode === 'wheelList' && styles.modeButtonTextActive
+          ]}>轉盤名單</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -112,12 +114,18 @@ export default function SpinScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 檢查收藏模式是否有餐廳 */}
-      {spinMode === 'favorites' && favorites.length === 0 ? (
+      {/* 檢查模式是否有餐廳 */}
+      {((spinMode === 'wheelList' && wheelList.length === 0) || 
+        (spinMode === 'favorites' && favorites.length === 0)) ? (
         <View style={styles.emptyFavorites}>
-          <Text style={styles.emptyIcon}>💔</Text>
-          <Text style={styles.emptyTitle}>口袋名單是空的</Text>
-          <Text style={styles.emptySubtitle}>先去探索頁面收藏一些喜歡的餐廳吧！</Text>
+          <Text style={styles.emptyTitle}>
+            {spinMode === 'wheelList' ? '轉盤名單是空的' : '口袋名單是空的'}
+          </Text>
+          <Text style={styles.emptySubtitle}>
+            {spinMode === 'wheelList' 
+              ? '先去探索或地圖頁面加入一些餐廳到轉盤吧！' 
+              : '先去探索頁面收藏一些喜歡的餐廳吧！'}
+          </Text>
         </View>
       ) : (
         <SpinWheel
@@ -129,16 +137,23 @@ export default function SpinScreen() {
 
       <View style={styles.statsContainer}>
         <Text style={styles.statsText}>
-          {spinMode === 'favorites' ? '口袋名單' : '可選餐廳'}：{availableRestaurants.length} 家
+          {spinMode === 'wheelList' ? '轉盤名單' : '口袋名單'}：{availableRestaurants.length} 家
         </Text>
-        {spinMode === 'all' && blacklist.length > 0 && (
-          <Text style={styles.blacklistText}>
-            已排除黑名單：{blacklist.length} 家
+        {spinMode === 'wheelList' && wheelList.length > 0 && (
+          <Text style={styles.wheelListText}>
+            總轉盤數：{wheelList.length} 家
           </Text>
         )}
         {spinMode === 'favorites' && favorites.length > 0 && (
           <Text style={styles.favoriteText}>
             總收藏數：{favorites.length} 家
+          </Text>
+        )}
+        {blacklist.length > 0 && (
+          <Text style={styles.blacklistText}>
+            黑名單中排除：{blacklist.filter(id => 
+              spinMode === 'wheelList' ? wheelList.includes(id) : favorites.includes(id)
+            ).length} 家
           </Text>
         )}
       </View>
@@ -194,6 +209,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: theme.colors.primary,
   },
+  wheelListText: {
+    fontSize: 14,
+    color: theme.colors.primary,
+  },
   modeSelector: {
     flexDirection: 'row',
     backgroundColor: theme.colors.background,
@@ -223,10 +242,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing.xl * 2,
     marginVertical: theme.spacing.xl,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: theme.spacing.md,
   },
   emptyTitle: {
     fontSize: 20,

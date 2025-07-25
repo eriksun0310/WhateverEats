@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { toggleFavorite, toggleBlacklist } from '../store/slices/restaurantSlice';
+import { toggleFavorite, toggleBlacklist, toggleWheelList } from '../store/slices/restaurantSlice';
 import { Restaurant } from '../types/restaurant';
 import { theme } from '../constants/theme';
-import { Heart, Ban, Star, Share2 } from 'lucide-react-native';
+import { Heart, Ban, Star, Share2, Dices } from 'lucide-react-native';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -15,11 +15,12 @@ interface RestaurantCardProps {
 
 export default function RestaurantCard({ restaurant, onPress, showActions = true }: RestaurantCardProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const { favorites, blacklist } = useSelector((state: RootState) => state.restaurant);
+  const { favorites, blacklist, wheelList } = useSelector((state: RootState) => state.restaurant);
   const user = useSelector((state: RootState) => state.user);
   
   const isFavorite = favorites.includes(restaurant.id);
   const isBlacklisted = blacklist.includes(restaurant.id);
+  const isInWheelList = wheelList.includes(restaurant.id);
 
   const handleToggleFavorite = (e: any) => {
     e.stopPropagation();
@@ -31,16 +32,21 @@ export default function RestaurantCard({ restaurant, onPress, showActions = true
     dispatch(toggleBlacklist(restaurant.id));
   };
 
+  const handleToggleWheelList = (e: any) => {
+    e.stopPropagation();
+    dispatch(toggleWheelList(restaurant.id));
+  };
+
   const handleShare = (e: any) => {
     e.stopPropagation();
     
     const userName = user.name || '朋友';
     const shareText = `${userName} 推薦你這家餐廳！
 
-🍽️ ${restaurant.name}
-📍 ${restaurant.address}
-⭐ 評分：${restaurant.rating}
-💰 價位：${'$'.repeat(restaurant.priceLevel)}
+${restaurant.name}
+地址：${restaurant.address}
+評分：${restaurant.rating}
+價位：${'$'.repeat(restaurant.priceLevel)}
 
 來自「隨便吃！」App 的推薦`;
 
@@ -78,21 +84,28 @@ export default function RestaurantCard({ restaurant, onPress, showActions = true
             <View style={styles.actionButtons}>
               <TouchableOpacity onPress={handleToggleFavorite} style={styles.actionButton}>
                 <Heart 
-                  size={24} 
+                  size={22} 
                   color={isFavorite ? theme.colors.error : theme.colors.text.light}
                   fill={isFavorite ? theme.colors.error : 'transparent'}
                 />
               </TouchableOpacity>
+              <TouchableOpacity onPress={handleToggleWheelList} style={styles.actionButton}>
+                <Dices 
+                  size={22} 
+                  color={isInWheelList ? theme.colors.primary : theme.colors.text.light}
+                  fill={isInWheelList ? theme.colors.primary : 'transparent'}
+                />
+              </TouchableOpacity>
               <TouchableOpacity onPress={handleToggleBlacklist} style={styles.actionButton}>
                 <Ban 
-                  size={24} 
+                  size={22} 
                   color={isBlacklisted ? theme.colors.error : theme.colors.text.light}
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={handleShare} style={styles.actionButton}>
                 <Share2 
-                  size={24} 
-                  color={theme.colors.primary}
+                  size={22} 
+                  color={theme.colors.text.secondary}
                 />
               </TouchableOpacity>
             </View>

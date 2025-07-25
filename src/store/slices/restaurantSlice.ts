@@ -5,6 +5,7 @@ import { mockRestaurants } from '../../constants/mockData';
 interface RestaurantState {
   restaurants: Restaurant[];
   favorites: string[];
+  wheelList: string[];
   blacklist: string[];
   filters: FilterOptions;
   loading: boolean;
@@ -13,6 +14,7 @@ interface RestaurantState {
 const initialState: RestaurantState = {
   restaurants: mockRestaurants,
   favorites: ['1', '4'], // Mock favorite IDs
+  wheelList: ['2', '3', '5'], // Mock wheel list IDs
   blacklist: [],
   filters: {
     cuisineTypes: [],
@@ -57,8 +59,20 @@ const restaurantSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    toggleWheelList: (state, action: PayloadAction<string>) => {
+      const restaurantId = action.payload;
+      if (state.wheelList.includes(restaurantId)) {
+        state.wheelList = state.wheelList.filter(id => id !== restaurantId);
+      } else {
+        state.wheelList.push(restaurantId);
+      }
+    },
+    removeFromWheelList: (state, action: PayloadAction<string>) => {
+      const restaurantId = action.payload;
+      state.wheelList = state.wheelList.filter(id => id !== restaurantId);
+    },
   },
 });
 
-export const { toggleFavorite, toggleBlacklist, removeFromFavorites, removeFromBlacklist, updateFilters, setLoading } = restaurantSlice.actions;
+export const { toggleFavorite, toggleBlacklist, removeFromFavorites, removeFromBlacklist, updateFilters, setLoading, toggleWheelList, removeFromWheelList } = restaurantSlice.actions;
 export default restaurantSlice.reducer;

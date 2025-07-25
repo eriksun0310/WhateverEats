@@ -228,7 +228,7 @@ export default function ExploreScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>😅 沒有找到符合條件的餐廳</Text>
+            <Text style={styles.emptyText}>沒有找到符合條件的餐廳</Text>
             <Text style={styles.emptySubtext}>試試調整篩選條件吧！</Text>
           </View>
         }
