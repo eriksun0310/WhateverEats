@@ -6,6 +6,7 @@ import { Provider, useSelector } from 'react-redux';
 import { store, RootState } from './src/store';
 import { Dices, Search, MapPin, User, Settings } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import SpinScreen from './src/screens/SpinScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
@@ -20,6 +21,8 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
+  
   return (
     <Tab.Navigator
       screenOptions={{
@@ -29,9 +32,13 @@ function MainTabs() {
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           borderTopWidth: 1,
-          paddingTop: 5,
-          paddingBottom: 5,
-          height: 60,
+          paddingTop: 8,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
+          height: 60 + (insets.bottom > 0 ? insets.bottom : 10),
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          marginBottom: 2,
         },
         headerStyle: {
           backgroundColor: theme.colors.primary,
@@ -140,8 +147,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <AppContent />
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <AppContent />
+      </Provider>
+    </SafeAreaProvider>
   );
 }
