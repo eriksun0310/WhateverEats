@@ -1,5 +1,13 @@
-# 隨便吃！ (Whatever Eats) - MVP 架構說明
 
+claude --dangerously-skip-permissions
+# 隨便吃！WhateverEats
+
+一款解決用餐選擇困難的 React Native App，提供餐廳隨機推薦、探索、地圖顯示和個人收藏功能。
+
+## 📱 專案文件
+
+- [MVP 規格書](./MVP_SPEC.md) - 產品功能規格與需求定義
+- [專案說明文件](./CLAUDE.md) - 技術架構與開發規範
 ## 📁 專案架構
 
 ```

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Restaurant } from '../types/restaurant';
 import { theme } from '../constants/theme';
+import { PartyPopper, X, Heart, Star, MapPin, Dices } from 'lucide-react-native';
 
 interface RestaurantResultModalProps {
   visible: boolean;
@@ -44,9 +45,12 @@ export default function RestaurantResultModal({
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* 標題區 */}
             <View style={styles.header}>
-              <Text style={styles.title}>🎉 為您推薦</Text>
+              <View style={styles.titleContainer}>
+                <PartyPopper size={24} color={theme.colors.primary} />
+                <Text style={styles.title}>為您推薦</Text>
+              </View>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Text style={styles.closeText}>✕</Text>
+                <X size={24} color={theme.colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
@@ -59,9 +63,11 @@ export default function RestaurantResultModal({
                 <Text style={styles.restaurantName}>{restaurant.name}</Text>
                 {onToggleFavorite && (
                   <TouchableOpacity onPress={onToggleFavorite}>
-                    <Text style={styles.favoriteIcon}>
-                      {restaurant.isFavorite ? '❤️' : '🤍'}
-                    </Text>
+                    <Heart 
+                      size={28} 
+                      color={restaurant.isFavorite ? theme.colors.error : theme.colors.text.light}
+                      fill={restaurant.isFavorite ? theme.colors.error : 'transparent'}
+                    />
                   </TouchableOpacity>
                 )}
               </View>
@@ -79,7 +85,10 @@ export default function RestaurantResultModal({
                 </View>
                 <View style={styles.detailRow}>
                   <Text style={styles.label}>評分</Text>
-                  <Text style={styles.value}>⭐ {restaurant.rating}</Text>
+                  <View style={styles.ratingContainer}>
+                    <Star size={16} color={theme.colors.warning} fill={theme.colors.warning} />
+                    <Text style={styles.value}>{restaurant.rating}</Text>
+                  </View>
                 </View>
                 {restaurant.distance && (
                   <View style={styles.detailRow}>
@@ -94,7 +103,10 @@ export default function RestaurantResultModal({
               </View>
 
               <View style={styles.addressContainer}>
-                <Text style={styles.addressLabel}>📍 地址</Text>
+                <View style={styles.addressLabelContainer}>
+                  <MapPin size={16} color={theme.colors.primary} />
+                  <Text style={styles.addressLabel}>地址</Text>
+                </View>
                 <Text style={styles.address}>{restaurant.address}</Text>
               </View>
             </View>
@@ -102,7 +114,10 @@ export default function RestaurantResultModal({
             {/* 按鈕區 */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.respinButton} onPress={onRespin}>
-                <Text style={styles.respinButtonText}>🎰 重新轉一次</Text>
+                <View style={styles.buttonContent}>
+                  <Dices size={20} color={theme.colors.primary} />
+                  <Text style={styles.respinButtonText}>重新轉一次</Text>
+                </View>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmButton} onPress={onClose}>
                 <Text style={styles.confirmButtonText}>就吃這家！</Text>
@@ -132,6 +147,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: theme.spacing.md,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
   title: {
     fontSize: 24,
@@ -189,16 +209,26 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     fontWeight: '600',
   },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   price: {
     color: theme.colors.primary,
   },
   addressContainer: {
     marginBottom: theme.spacing.md,
   },
+  addressLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.xs,
+  },
   addressLabel: {
     fontSize: 16,
     color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
   },
   address: {
     fontSize: 16,
@@ -216,6 +246,11 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
     alignItems: 'center',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
   },
   respinButtonText: {
     fontSize: 16,
