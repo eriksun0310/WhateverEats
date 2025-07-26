@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,6 +15,7 @@ import MyScreen from './src/screens/MyScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import SplashScreen from './src/components/SplashScreen';
 import { theme } from './src/constants/theme';
 
 const Tab = createBottomTabNavigator();
@@ -138,6 +139,16 @@ function RootNavigator() {
 }
 
 function AppContent() {
+  const [isShowSplash, setIsShowSplash] = useState(true);
+
+  const handleSplashComplete = () => {
+    setIsShowSplash(false);
+  };
+
+  if (isShowSplash) {
+    return <SplashScreen onAnimationComplete={handleSplashComplete} />;
+  }
+
   return (
     <NavigationContainer fallback={null}>
       <RootNavigator />
