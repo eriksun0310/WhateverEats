@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,15 +10,15 @@ import {
   Alert,
   TextInput,
   FlatList,
-  Modal,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { theme } from '../constants/theme';
 import RestaurantCard from '../components/RestaurantCard';
+import FilterBottomSheet from '../shared/ui/FilterBottomSheet';
 import { Restaurant } from '../types/restaurant';
-import { Utensils, Navigation, Star, Search, Filter, X } from 'lucide-react-native';
+import { Utensils, Navigation, Search, Filter, X } from 'lucide-react-native';
 import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
@@ -39,6 +39,7 @@ export default function MapScreen() {
   const [region, setRegion] = useState<Region>(DEFAULT_REGION);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>([]);
+  const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const mapRef = useRef<MapView>(null);
@@ -48,8 +49,10 @@ export default function MapScreen() {
     restaurant => !blacklist.includes(restaurant.id)
   );
 
-  // 取得所有料理類型
-  const allCuisineTypes = [...new Set(restaurants.map(r => r.cuisineType))];
+  // 取得所有料理類型 - 確保資料有效
+  const allCuisineTypes = restaurants.length > 0 
+    ? [...new Set(restaurants.map(r => r.cuisineType).filter(Boolean))]
+    : ['台式料理', '日式料理', '小吃', '創意料理']; // 預設值
 
   // 篩選功能
   const filteredRestaurants = availableRestaurants.filter(restaurant => {
@@ -61,7 +64,11 @@ export default function MapScreen() {
     const matchesCuisine = selectedCuisineTypes.length === 0 || 
       selectedCuisineTypes.includes(restaurant.cuisineType);
     
-    return matchesSearch && matchesCuisine;
+    // 距離篩選
+    const matchesDistance = selectedDistance === null || 
+      (restaurant.distance && restaurant.distance <= selectedDistance);
+    
+    return matchesSearch && matchesCuisine && matchesDistance;
   });
 
   const selectedRestaurantData = availableRestaurants.find(
@@ -212,9 +219,11 @@ export default function MapScreen() {
           onPress={() => setShowFilterModal(true)}
         >
           <Filter size={20} color={theme.colors.surface} />
-          {selectedCuisineTypes.length > 0 && (
+          {(selectedCuisineTypes.length > 0 || selectedDistance !== null) && (
             <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>{selectedCuisineTypes.length}</Text>
+              <Text style={styles.filterBadgeText}>
+                {selectedCuisineTypes.length + (selectedDistance !== null ? 1 : 0)}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
@@ -233,7 +242,7 @@ export default function MapScreen() {
               >
                 <Text style={styles.searchResultName}>{item.name}</Text>
                 <Text style={styles.searchResultInfo}>
-                  {item.cuisineType} · ⭐ {item.rating}
+                  {item.cuisineType} · {item.rating} 分
                 </Text>
               </TouchableOpacity>
             )}
@@ -244,8 +253,30 @@ export default function MapScreen() {
         </View>
       )}
 
+      {/* 篩選條件顯示 */}
+      {(selectedCuisineTypes.length > 0 || selectedDistance !== null) && (
+        <View style={styles.activeFiltersContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.activeFiltersWrapper}>
+              {selectedDistance && (
+                <View style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>
+                    {selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
+                  </Text>
+                </View>
+              )}
+              {selectedCuisineTypes.map((cuisineType) => (
+                <View key={cuisineType} style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>{cuisineType}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      )}
+
       {/* 頂部資訊欄 */}
-      <View style={[styles.topInfo, { top: 120 }]}>
+      <View style={[styles.topInfo, { top: (selectedCuisineTypes.length > 0 || selectedDistance !== null) ? 170 : 120 }]}>
         <Text style={styles.infoText}>
           顯示 {filteredRestaurants.length} 家餐廳
         </Text>
@@ -257,7 +288,7 @@ export default function MapScreen() {
           <View style={styles.detailHeader}>
             <Text style={styles.detailTitle}>餐廳詳情</Text>
             <TouchableOpacity onPress={() => setSelectedRestaurant(null)}>
-              <Text style={styles.closeButton}>✕</Text>
+              <Text style={styles.closeButton}>×</Text>
             </TouchableOpacity>
           </View>
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -266,59 +297,21 @@ export default function MapScreen() {
         </View>
       )}
 
-      {/* 篩選 Modal */}
-      <Modal
+      {/* 篩選 Bottom Sheet */}
+      <FilterBottomSheet
         visible={showFilterModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowFilterModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>篩選料理類型</Text>
-              <TouchableOpacity onPress={() => setShowFilterModal(false)}>
-                <X size={24} color={theme.colors.text.secondary} />
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.modalBody}>
-              {allCuisineTypes.map((cuisineType) => (
-                <TouchableOpacity
-                  key={cuisineType}
-                  style={styles.cuisineTypeItem}
-                  onPress={() => toggleCuisineType(cuisineType)}
-                >
-                  <Text style={styles.cuisineTypeText}>{cuisineType}</Text>
-                  <View style={[
-                    styles.checkbox,
-                    selectedCuisineTypes.includes(cuisineType) && styles.checkboxSelected
-                  ]}>
-                    {selectedCuisineTypes.includes(cuisineType) && (
-                      <Text style={styles.checkmark}>✓</Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            
-            <View style={styles.modalFooter}>
-              <TouchableOpacity
-                style={styles.clearButton}
-                onPress={() => setSelectedCuisineTypes([])}
-              >
-                <Text style={styles.clearButtonText}>清除全部</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.applyButton}
-                onPress={() => setShowFilterModal(false)}
-              >
-                <Text style={styles.applyButtonText}>套用</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setShowFilterModal(false)}
+        cuisineTypes={allCuisineTypes}
+        selectedCuisineTypes={selectedCuisineTypes}
+        selectedDistance={selectedDistance}
+        onCuisineTypeToggle={toggleCuisineType}
+        onDistanceSelect={setSelectedDistance}
+        onClear={() => {
+          setSelectedCuisineTypes([]);
+          setSelectedDistance(null);
+        }}
+        onApply={() => setShowFilterModal(false)}
+      />
     </View>
   );
 }
@@ -509,89 +502,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.text.secondary,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
+  activeFiltersContainer: {
+    position: 'absolute',
+    top: 115,
+    left: 0,
+    right: 0,
     backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-    maxHeight: height * 0.7,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
+    zIndex: 10,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text.primary,
-  },
-  modalBody: {
-    padding: theme.spacing.lg,
-  },
-  cuisineTypeItem: {
+  activeFiltersWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: theme.spacing.md,
+    gap: theme.spacing.sm,
   },
-  cuisineTypeText: {
-    fontSize: 16,
-    color: theme.colors.text.primary,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
-    borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxSelected: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  checkmark: {
-    color: theme.colors.surface,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  clearButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
+  activeFilterChip: {
+    backgroundColor: theme.colors.primary + '20',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.lg,
     borderWidth: 1,
     borderColor: theme.colors.primary,
-    alignItems: 'center',
   },
-  clearButtonText: {
+  activeFilterText: {
+    fontSize: 14,
     color: theme.colors.primary,
-    fontWeight: '600',
-  },
-  applyButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-  },
-  applyButtonText: {
-    color: theme.colors.surface,
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });

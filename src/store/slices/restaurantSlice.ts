@@ -71,8 +71,11 @@ const restaurantSlice = createSlice({
       const restaurantId = action.payload;
       state.wheelList = state.wheelList.filter(id => id !== restaurantId);
     },
+    setFilters: (state, action: PayloadAction<FilterOptions>) => {
+      state.filters = action.payload;
+    },
   },
 });
 
-export const { toggleFavorite, toggleBlacklist, removeFromFavorites, removeFromBlacklist, updateFilters, setLoading, toggleWheelList, removeFromWheelList } = restaurantSlice.actions;
+export const { toggleFavorite, toggleBlacklist, removeFromFavorites, removeFromBlacklist, updateFilters, setLoading, toggleWheelList, removeFromWheelList, setFilters } = restaurantSlice.actions;
 export default restaurantSlice.reducer;

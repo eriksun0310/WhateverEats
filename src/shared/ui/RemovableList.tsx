@@ -7,8 +7,8 @@ import { Restaurant } from '../../types/restaurant';
 
 interface RemovableListProps {
   data: any[];
-  onRemove: (id: string) => void;
-  removeButtonText: string;
+  onRemove?: (id: string) => void;
+  removeButtonText?: string;
   emptyStateProps: {
     title: string;
     subtitle?: string;
@@ -24,8 +24,6 @@ interface RemovableListProps {
 
 export default function RemovableList({
   data,
-  onRemove,
-  removeButtonText,
   emptyStateProps,
   renderHeader,
   keyExtractor = (item) => item.id,
@@ -38,12 +36,6 @@ export default function RemovableList({
         <View style={styles.cardWrapper}>
           {renderHeader && renderHeader(item)}
           <RestaurantCard restaurant={item as Restaurant} />
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => onRemove(item.id)}
-          >
-            <Text style={styles.removeButtonText}>{removeButtonText}</Text>
-          </TouchableOpacity>
         </View>
       )}
       ListEmptyComponent={<EmptyState {...emptyStateProps} />}
@@ -58,18 +50,5 @@ const styles = StyleSheet.create({
   },
   cardWrapper: {
     marginBottom: theme.spacing.md,
-  },
-  removeButton: {
-    backgroundColor: theme.colors.error,
-    padding: theme.spacing.sm,
-    alignItems: 'center',
-    borderBottomLeftRadius: theme.borderRadius.lg,
-    borderBottomRightRadius: theme.borderRadius.lg,
-    marginTop: -theme.borderRadius.lg,
-  },
-  removeButtonText: {
-    color: theme.colors.surface,
-    fontSize: 14,
-    fontWeight: '600',
   },
 });

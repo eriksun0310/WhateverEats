@@ -52,16 +52,16 @@ export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: S
     transform: [{ rotate: spinInterpolate }],
   };
 
-  // 分段顏色
+  // 分段顏色 - 使用舒適且有層次的配色
   const segments = [
-    { color: '#FF6F3C', emoji: '🍕' },
-    { color: '#FFA726', emoji: '🍜' },
-    { color: '#66BB6A', emoji: '🍱' },
-    { color: '#42A5F5', emoji: '🍔' },
-    { color: '#AB47BC', emoji: '🥘' },
-    { color: '#EF5350', emoji: '🍖' },
-    { color: '#29B6F6', emoji: '🥗' },
-    { color: '#FFA726', emoji: '🍝' },
+    { color: '#FF8B94' }, // 珊瑚粉
+    { color: '#FFD3B6' }, // 蜜桃橘
+    { color: '#FFAAA5' }, // 鮭魚粉
+    { color: '#8FCACA' }, // 薄荷綠
+    { color: '#A8DADC' }, // 粉藍色
+    { color: '#F1E0A5' }, // 奶油黃
+    { color: '#B2B2E0' }, // 薰衣草紫
+    { color: '#FFB6B9' }, // 玫瑰粉
   ];
 
   return (
@@ -83,9 +83,7 @@ export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: S
                     ],
                   },
                 ]}
-              >
-                <Text style={styles.segmentEmoji}>{segment.emoji}</Text>
-              </View>
+              />
             );
           })}
         </Animated.View>

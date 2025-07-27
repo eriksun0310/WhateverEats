@@ -15,12 +15,17 @@ import { AppDispatch } from '../store';
 import { setUser } from '../store/slices/userSlice';
 import { theme } from '../constants/theme';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
+import { Image } from 'react-native';
+
+const avatarOptions = [
+  { id: 'dog', image: require('../../assets/image/dog.png'), label: '老實說狗狗' },
+  { id: 'cat', image: require('../../assets/image/cat.png'), label: '老實說貓貓' },
+];
 
 interface RegisterScreenProps {
   navigation: any;
 }
 
-const avatarOptions = ['👤', '🧑', '👩', '👨', '🧔', '👱'];
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -30,7 +35,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     password: '',
     confirmPassword: '',
   });
-  const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0]);
+  const [selectedAvatar, setSelectedAvatar] = useState(avatarOptions[0].id);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -114,14 +119,15 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
             <View style={styles.avatarOptions}>
               {avatarOptions.map((avatar) => (
                 <TouchableOpacity
-                  key={avatar}
+                  key={avatar.id}
                   style={[
                     styles.avatarOption,
-                    selectedAvatar === avatar && styles.selectedAvatar,
+                    selectedAvatar === avatar.id && styles.selectedAvatar,
                   ]}
-                  onPress={() => setSelectedAvatar(avatar)}
+                  onPress={() => setSelectedAvatar(avatar.id)}
                 >
-                  <Text style={styles.avatarText}>{avatar}</Text>
+                  <Image source={avatar.image} style={styles.avatarImage} />
+                  <Text style={styles.avatarLabel}>{avatar.label}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -265,24 +271,31 @@ const styles = StyleSheet.create({
   },
   avatarOptions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.sm,
+    justifyContent: 'center',
+    gap: theme.spacing.lg,
   },
   avatarOption: {
-    width: 60,
-    height: 60,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 30,
     alignItems: 'center',
-    justifyContent: 'center',
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
     borderWidth: 2,
     borderColor: 'transparent',
+    backgroundColor: theme.colors.surface,
   },
   selectedAvatar: {
     borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + '10',
   },
-  avatarText: {
-    fontSize: 32,
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: theme.spacing.sm,
+  },
+  avatarLabel: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    fontWeight: '500',
   },
   inputContainer: {
     flexDirection: 'row',

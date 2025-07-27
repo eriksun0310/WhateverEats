@@ -44,6 +44,7 @@ export default function MyScreen() {
   const { restaurants, favorites, blacklist, wheelList } = useSelector(
     (state: RootState) => state.restaurant
   );
+  const isGuest = user.email === 'test@example.com';
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const contentFlatListRef = useRef<FlatList>(null);
@@ -197,11 +198,18 @@ export default function MyScreen() {
       <View style={styles.profileSection}>
         <View style={styles.profileContent}>
           <Image 
-            source={user.avatar === 'women' ? require('../../assets/image/cat.png') : require('../../assets/image/dog.png')}
+            source={user.avatar === 'cat' ? require('../../assets/image/cat.png') : require('../../assets/image/dog.png')}
             style={styles.avatar}
           />
           <Text style={styles.userName}>{user.name}</Text>
           <Text style={styles.userEmail}>{user.email}</Text>
+          {isGuest && (
+            <View style={styles.guestTip}>
+              <Text style={styles.guestTipText}>
+                訪客模式中 - 點右上角註冊獲得完整功能
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -326,5 +334,17 @@ const styles = StyleSheet.create({
   recommendationDate: {
     fontSize: 12,
     color: theme.colors.text.light,
+  },
+  guestTip: {
+    marginTop: theme.spacing.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.lg,
+  },
+  guestTipText: {
+    fontSize: 12,
+    color: theme.colors.surface,
+    fontWeight: '500',
   },
 });

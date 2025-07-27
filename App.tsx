@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Provider, useSelector } from 'react-redux';
 import { store, RootState } from './src/store';
-import { Dices, Search, MapPin, User, Settings } from 'lucide-react-native';
+import { Dices, Search, MapPin, User, Settings, UserPlus } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -83,20 +83,29 @@ function MainTabs() {
       <Tab.Screen
         name="My"
         component={MyScreen}
-        options={({ navigation }) => ({
-          title: '我的',
-          tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
-          ),
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Settings' as never)}
-              style={{ marginRight: theme.spacing.md }}
-            >
-              <Settings size={24} color={theme.colors.surface} />
-            </TouchableOpacity>
-          ),
-        })}
+        options={({ navigation }) => {
+          const user = useSelector((state: RootState) => state.user);
+          const isGuest = user.email === 'test@example.com';
+          
+          return {
+            title: '我的',
+            tabBarIcon: ({ color, size }) => (
+              <User size={size} color={color} />
+            ),
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate(isGuest ? 'Register' : 'Settings' as never)}
+                style={{ marginRight: theme.spacing.md }}
+              >
+                {isGuest ? (
+                  <UserPlus size={24} color={theme.colors.surface} />
+                ) : (
+                  <Settings size={24} color={theme.colors.surface} />
+                )}
+              </TouchableOpacity>
+            ),
+          };
+        }}
       />
     </Tab.Navigator>
   );
@@ -110,7 +119,11 @@ function RootNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {isLoggedIn ? (
         <>
-          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen 
+            name="MainTabs" 
+            component={MainTabs} 
+            options={{ headerShown: false }}
+          />
           <Stack.Screen 
             name="Settings" 
             component={SettingsScreen}
@@ -126,12 +139,33 @@ function RootNavigator() {
               },
             }}
           />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
         </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen 
+            name="MainTabs" 
+            component={MainTabs} 
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Settings" 
+            component={SettingsScreen}
+            options={{
+              headerShown: true,
+              title: '設定',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
         </>
       )}
     </Stack.Navigator>

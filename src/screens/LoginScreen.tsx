@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../store';
@@ -42,8 +43,8 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         dispatch(setUser({
           id: '1',
           email: email,
-          name: '測試使用者',
-          avatar: '👤',
+          name: '測試用戶',
+          avatar: 'default',
         }));
         
         // 導航到主畫面
@@ -65,7 +66,12 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.logo}>🍽️</Text>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('../../assets/image/appIcon.png')} 
+              style={styles.logo}
+            />
+          </View>
           <Text style={styles.title}>隨便吃！</Text>
           <Text style={styles.subtitle}>解決你的選擇困難</Text>
         </View>
@@ -136,15 +142,15 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             onPress={() => {
               // 使用預設測試帳號
               dispatch(setUser({
-                id: '1',
+                id: 'guest',
                 email: 'test@example.com',
                 name: '訪客',
-                avatar: '👤',
+                avatar: 'default',
               }));
               navigation.replace('MainTabs');
             }}
           >
-            <Text style={styles.skipButtonText}>先逛逛看 →</Text>
+            <Text style={styles.skipButtonText}>先逛逛看（訪客模式）→</Text>
           </TouchableOpacity>
         </View>
 
@@ -172,9 +178,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: theme.spacing.xl * 2,
   },
-  logo: {
-    fontSize: 64,
+  logoContainer: {
     marginBottom: theme.spacing.md,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
   },
   title: {
     fontSize: 32,

@@ -18,8 +18,8 @@ import { theme } from '../constants/theme';
 import { ChevronRight, Edit3, LogOut, User as UserIcon, Info, Shield } from 'lucide-react-native';
 
 const avatarOptions = [
-  { id: 'man', image: require('../../assets/image/dog.png'), label: '老實說狗狗' },
-  { id: 'women', image: require('../../assets/image/cat.png'), label: '老實說貓貓' },
+  { id: 'dog', image: require('../../assets/image/dog.png'), label: '老實說狗狗' },
+  { id: 'cat', image: require('../../assets/image/cat.png'), label: '老實說貓貓' },
 ];
 
 export default function SettingsScreen() {
@@ -56,7 +56,10 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: () => {
             dispatch(logout());
-            navigation.navigate('Login' as never);
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            });
           },
         },
       ]
@@ -93,7 +96,7 @@ export default function SettingsScreen() {
         {/* 用戶資訊區 */}
         <View style={styles.userSection}>
           <Image 
-            source={user.avatar === 'women' ? require('../../assets/image/cat.png') : require('../../assets/image/dog.png')}
+            source={user.avatar === 'cat' ? require('../../assets/image/cat.png') : require('../../assets/image/dog.png')}
             style={styles.avatar}
           />
           <View style={styles.userInfo}>
@@ -140,7 +143,7 @@ export default function SettingsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>編輯個人資料</Text>
               <TouchableOpacity onPress={() => setShowEditProfile(false)}>
-                <Text style={styles.closeButton}>✕</Text>
+                <Text style={styles.closeButton}>×</Text>
               </TouchableOpacity>
             </View>
 

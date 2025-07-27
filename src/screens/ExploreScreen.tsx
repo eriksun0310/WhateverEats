@@ -3,30 +3,31 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../store';
-import { setFilters } from '../store/slices/restaurantSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { theme } from '../constants/theme';
 import RestaurantCard from '../components/RestaurantCard';
-import { Restaurant, CuisineType, PriceLevel } from '../types/restaurant';
+import FilterBottomSheet from '../shared/ui/FilterBottomSheet';
 import { Search, Filter } from 'lucide-react-native';
 
 export default function ExploreScreen() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { restaurants, filters, blacklist } = useSelector(
+  const { restaurants, blacklist } = useSelector(
     (state: RootState) => state.restaurant
   );
 
   const [searchText, setSearchText] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedCuisineType, setSelectedCuisineType] = useState<CuisineType | null>(null);
-  const [selectedPriceLevel, setSelectedPriceLevel] = useState<PriceLevel | null>(null);
+  const [selectedCuisineTypes, setSelectedCuisineTypes] = useState<string[]>([]);
   const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
+  
+  // 取得所有料理類型 - 確保資料有效
+  const allCuisineTypes = restaurants.length > 0 
+    ? [...new Set(restaurants.map(r => r.cuisineType).filter(Boolean))]
+    : ['台式料理', '日式料理', '小吃', '創意料理']; // 預設值
 
   // 篩選餐廳資料
   const filteredRestaurants = useMemo(() => {
@@ -46,63 +47,33 @@ export default function ExploreScreen() {
       }
 
       // 料理類型篩選
-      if (selectedCuisineType && restaurant.cuisineType !== selectedCuisineType) {
-        return false;
-      }
-
-      // 價位篩選
-      if (selectedPriceLevel && restaurant.priceLevel !== selectedPriceLevel) {
-        return false;
-      }
+      const matchesCuisine = selectedCuisineTypes.length === 0 || 
+        selectedCuisineTypes.includes(restaurant.cuisineType);
 
       // 距離篩選
-      if (selectedDistance && restaurant.distance && restaurant.distance > selectedDistance) {
-        return false;
-      }
+      const matchesDistance = selectedDistance === null || 
+        (restaurant.distance && restaurant.distance <= selectedDistance);
 
-      return true;
+      return matchesCuisine && matchesDistance;
     });
-  }, [restaurants, blacklist, searchText, selectedCuisineType, selectedPriceLevel, selectedDistance]);
+  }, [restaurants, blacklist, searchText, selectedCuisineTypes, selectedDistance]);
 
-  const cuisineTypes = [
-    { value: null, label: '全部' },
-    { value: '台式', label: '台式' },
-    { value: '日式', label: '日式' },
-    { value: '韓式', label: '韓式' },
-    { value: '美式', label: '美式' },
-    { value: '義式', label: '義式' },
-    { value: '泰式', label: '泰式' },
-    { value: '其他', label: '其他' },
-  ];
-
-  const priceLevels = [
-    { value: null, label: '全部' },
-    { value: 1, label: '$' },
-    { value: 2, label: '$$' },
-    { value: 3, label: '$$$' },
-    { value: 4, label: '$$$$' },
-  ];
-
-  const distances = [
-    { value: null, label: '全部' },
-    { value: 500, label: '500m' },
-    { value: 1000, label: '1km' },
-    { value: 3000, label: '3km' },
-    { value: 5000, label: '5km' },
-  ];
-
-  const clearFilters = () => {
-    setSelectedCuisineType(null);
-    setSelectedPriceLevel(null);
-    setSelectedDistance(null);
-    setSearchText('');
+  // 切換料理類型篩選
+  const toggleCuisineType = (cuisineType: string) => {
+    setSelectedCuisineTypes(prev => {
+      if (prev.includes(cuisineType)) {
+        return prev.filter(type => type !== cuisineType);
+      }
+      return [...prev, cuisineType];
+    });
   };
 
-  const activeFiltersCount = [
-    selectedCuisineType,
-    selectedPriceLevel,
-    selectedDistance,
-  ].filter(Boolean).length;
+  const clearFilters = () => {
+    setSelectedCuisineTypes([]);
+    setSelectedDistance(null);
+  };
+
+  const activeFiltersCount = selectedCuisineTypes.length + (selectedDistance !== null ? 1 : 0);
 
   return (
     <View style={styles.container}>
@@ -118,108 +89,51 @@ export default function ExploreScreen() {
           />
           <TouchableOpacity
             style={styles.filterButton}
-            onPress={() => setShowFilters(!showFilters)}
+            onPress={() => setShowFilters(true)}
           >
-            <View style={styles.filterButtonContent}>
-              <Filter size={20} color={theme.colors.text.primary} />
-              <Text style={styles.filterButtonText}>
-                篩選
-                {activeFiltersCount > 0 && ` (${activeFiltersCount})`}
-              </Text>
-            </View>
+            <Filter size={20} color={theme.colors.surface} />
+            {activeFiltersCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
 
-      {showFilters && (
-        <View style={styles.filtersContainer}>
-          {/* 料理類型篩選 */}
-          <View style={styles.filterSection}>
-            <Text style={styles.filterTitle}>料理類型</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={styles.filterOptions}>
-                {cuisineTypes.map((type) => (
-                  <TouchableOpacity
-                    key={type.label}
-                    style={[
-                      styles.filterChip,
-                      selectedCuisineType === type.value && styles.filterChipActive,
-                    ]}
-                    onPress={() => setSelectedCuisineType(type.value as CuisineType | null)}
-                  >
-                    <Text
-                      style={[
-                        styles.filterChipText,
-                        selectedCuisineType === type.value && styles.filterChipTextActive,
-                      ]}
-                    >
-                      {type.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* 價位篩選 */}
-          <View style={styles.filterSection}>
-            <Text style={styles.filterTitle}>價位</Text>
-            <View style={styles.filterOptions}>
-              {priceLevels.map((level) => (
-                <TouchableOpacity
-                  key={level.label}
-                  style={[
-                    styles.filterChip,
-                    selectedPriceLevel === level.value && styles.filterChipActive,
-                  ]}
-                  onPress={() => setSelectedPriceLevel(level.value as PriceLevel | null)}
-                >
-                  <Text
-                    style={[
-                      styles.filterChipText,
-                      selectedPriceLevel === level.value && styles.filterChipTextActive,
-                    ]}
-                  >
-                    {level.label}
+      {/* 篩選條件顯示 */}
+      {activeFiltersCount > 0 && (
+        <View style={styles.activeFiltersContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.activeFiltersWrapper}>
+              {selectedDistance && (
+                <View style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>
+                    {selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
                   </Text>
-                </TouchableOpacity>
+                </View>
+              )}
+              {selectedCuisineTypes.map((cuisineType) => (
+                <View key={cuisineType} style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>{cuisineType}</Text>
+                </View>
               ))}
             </View>
-          </View>
-
-          {/* 距離篩選 */}
-          <View style={styles.filterSection}>
-            <Text style={styles.filterTitle}>距離</Text>
-            <View style={styles.filterOptions}>
-              {distances.map((dist) => (
-                <TouchableOpacity
-                  key={dist.label}
-                  style={[
-                    styles.filterChip,
-                    selectedDistance === dist.value && styles.filterChipActive,
-                  ]}
-                  onPress={() => setSelectedDistance(dist.value)}
-                >
-                  <Text
-                    style={[
-                      styles.filterChipText,
-                      selectedDistance === dist.value && styles.filterChipTextActive,
-                    ]}
-                  >
-                    {dist.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          {activeFiltersCount > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
-              <Text style={styles.clearButtonText}>清除篩選</Text>
-            </TouchableOpacity>
-          )}
+          </ScrollView>
         </View>
       )}
+
+      <FilterBottomSheet
+        visible={showFilters}
+        onClose={() => setShowFilters(false)}
+        cuisineTypes={allCuisineTypes}
+        selectedCuisineTypes={selectedCuisineTypes}
+        selectedDistance={selectedDistance}
+        onCuisineTypeToggle={toggleCuisineType}
+        onDistanceSelect={setSelectedDistance}
+        onClear={clearFilters}
+        onApply={() => setShowFilters(false)}
+      />
 
       <FlatList
         data={filteredRestaurants}
@@ -273,70 +187,51 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
+    width: 45,
+    height: 45,
+    borderRadius: theme.borderRadius.lg,
     justifyContent: 'center',
-  },
-  filterButtonContent: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.xs,
   },
-  filterButtonText: {
+  filterBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: theme.colors.error,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  filterBadgeText: {
     color: theme.colors.surface,
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
-  filtersContainer: {
+  activeFiltersContainer: {
     backgroundColor: theme.colors.surface,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  filterSection: {
-    marginBottom: theme.spacing.md,
-  },
-  filterTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.sm,
-    marginHorizontal: theme.spacing.md,
-  },
-  filterOptions: {
+  activeFiltersWrapper: {
     flexDirection: 'row',
-    paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.sm,
   },
-  filterChip: {
-    backgroundColor: theme.colors.background,
+  activeFilterChip: {
+    backgroundColor: theme.colors.primary + '20',
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.xl,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.lg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  filterChipActive: {
-    backgroundColor: theme.colors.primary,
     borderColor: theme.colors.primary,
   },
-  filterChipText: {
+  activeFilterText: {
     fontSize: 14,
-    color: theme.colors.text.primary,
-  },
-  filterChipTextActive: {
-    color: theme.colors.surface,
-    fontWeight: '600',
-  },
-  clearButton: {
-    marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.sm,
-    alignSelf: 'flex-start',
-  },
-  clearButtonText: {
     color: theme.colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   listContent: {
     padding: theme.spacing.md,
