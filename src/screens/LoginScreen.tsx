@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,9 @@ import { setUser } from '../store/slices/userSlice';
 import { theme } from '../constants/theme';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { AuthService } from '../services/authService';
+import FormInput from '../components/FormInput';
+import Button from '../components/Button';
+import { shadows } from '../constants/shadows';
 
 interface LoginScreenProps {
   navigation: any;

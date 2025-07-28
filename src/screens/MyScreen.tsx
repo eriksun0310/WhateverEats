@@ -36,6 +36,7 @@ interface TabConfig {
     };
   };
   renderHeader?: (item: any) => React.ReactNode;
+  onCardPress?: (item: any) => void;
 }
 
 export default function MyScreen() {
@@ -131,6 +132,20 @@ export default function MyScreen() {
         title: '黑名單是空的',
         subtitle: '不喜歡的餐廳可以加入黑名單',
       },
+      onCardPress: (item) => {
+        Alert.alert(
+          '移除黑名單',
+          `確定要將「${item.name}」從黑名單移除嗎？`,
+          [
+            { text: '取消', style: 'cancel' },
+            { 
+              text: '移除', 
+              style: 'destructive',
+              onPress: () => dispatch(removeFromBlacklist(item.id))
+            },
+          ]
+        );
+      },
     },
     {
       key: 'recommendations',
@@ -188,6 +203,7 @@ export default function MyScreen() {
         removeButtonText={item.removeButtonText || ''}
         emptyStateProps={item.emptyState}
         renderHeader={item.renderHeader}
+        onCardPress={item.onCardPress}
       />
     </View>
   );

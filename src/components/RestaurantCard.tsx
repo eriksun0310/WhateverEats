@@ -6,6 +6,7 @@ import { toggleFavorite, toggleBlacklist, toggleWheelList } from '../store/slice
 import { Restaurant } from '../types/restaurant';
 import { theme } from '../constants/theme';
 import { Heart, Ban, Star, Share2, Dices } from 'lucide-react-native';
+import { shadows } from '../constants/shadows';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -151,11 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     marginHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.sm,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...shadows.light,
     overflow: 'hidden',
   },
   image: {

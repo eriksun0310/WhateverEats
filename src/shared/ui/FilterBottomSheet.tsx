@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
-import FilterButtonGroup from '../../components/FilterButtonGroup';
+import { FilterButton } from '../../components/FilterButton';
+import Button from '../../components/Button';
 
 const { height } = Dimensions.get('window');
 
@@ -82,13 +83,17 @@ export default function FilterBottomSheet({
             {/* 距離範圍 */}
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>距離範圍</Text>
-              <FilterButtonGroup
-                options={DISTANCE_OPTIONS}
-                selectedValues={selectedDistance ? [selectedDistance] : []}
-                onToggle={(value) => onDistanceSelect(value as number | null)}
-                multiple={false}
-                containerStyle={styles.buttonContainer}
-              />
+              <View style={styles.buttonGroup}>
+                {DISTANCE_OPTIONS.map((option) => (
+                  <FilterButton
+                    key={option.value}
+                    label={option.label}
+                    isActive={selectedDistance === option.value}
+                    onPress={() => onDistanceSelect(selectedDistance === option.value ? null : option.value)}
+                    // style={styles.filterButtonStyle}
+                  />
+                ))}
+              </View>
             </View>
             
             <View style={styles.filterDivider} />
@@ -96,29 +101,33 @@ export default function FilterBottomSheet({
             {/* 料理類型 */}
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>料理類型</Text>
-              <FilterButtonGroup
-                options={displayCuisineTypes}
-                selectedValues={selectedCuisineTypes}
-                onToggle={(value) => onCuisineTypeToggle(value as string)}
-                multiple={true}
-                containerStyle={styles.buttonContainer}
-              />
+              <View style={styles.buttonGroup}>
+                {displayCuisineTypes.map((cuisineType) => (
+                  <FilterButton
+                    key={cuisineType}
+                    label={cuisineType}
+                    isActive={selectedCuisineTypes.includes(cuisineType)}
+                    onPress={() => onCuisineTypeToggle(cuisineType)}
+                    // style={styles.filterButtonStyle}
+                  />
+                ))}
+              </View>
             </View>
           </ScrollView>
           
           <View style={styles.modalFooter}>
-            <TouchableOpacity
-              style={styles.clearButton}
+            <Button
+              title="清除全部"
+              variant="outline"
               onPress={onClear}
-            >
-              <Text style={styles.clearButtonText}>清除全部</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.applyButton}
+              containerStyle={{ flex: 1, marginRight: theme.spacing.xs }}
+            />
+            <Button
+              title="套用"
+              variant="primary"
               onPress={handleApply}
-            >
-              <Text style={styles.applyButtonText}>套用</Text>
-            </TouchableOpacity>
+              containerStyle={{ flex: 1, marginLeft: theme.spacing.xs }}
+            />
           </View>
         </View>
       </View>
@@ -146,8 +155,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    // borderBottomWidth: 1,
+    // borderBottomColor: theme.colors.border,
   },
   modalTitle: {
     fontSize: 18,
@@ -168,8 +177,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
   },
-  buttonContainer: {
+  buttonGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     paddingHorizontal: theme.spacing.md,
+  },
+  filterButtonStyle: {
+    // 使用預設樣式
   },
   filterDivider: {
     height: 1,
@@ -186,33 +200,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-  },
-  clearButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1.5,
-    borderColor: theme.colors.primary,
-    alignItems: 'center',
-    marginRight: theme.spacing.xs,
-  },
-  clearButtonText: {
-    color: theme.colors.primary,
-    fontWeight: '600',
-    fontSize: 15,
-  },
-  applyButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.md,
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.md,
-    alignItems: 'center',
-    marginLeft: theme.spacing.xs,
-  },
-  applyButtonText: {
-    color: theme.colors.surface,
-    fontWeight: '600',
-    fontSize: 15,
   },
   emptyText: {
     fontSize: 14,

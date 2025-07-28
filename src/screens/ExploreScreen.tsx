@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: theme.spacing.md,
+    padding: theme.spacing.sm,
     // backgroundColor: theme.colors.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   searchContainer: {
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   listContent: {
-    padding: theme.spacing.md,
+    // padding: theme.spacing.md,
   },
   emptyContainer: {
     flex: 1,

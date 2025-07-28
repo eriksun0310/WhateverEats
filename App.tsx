@@ -15,6 +15,10 @@ import MyScreen from './src/screens/MyScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
+import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import AboutScreen from './src/screens/AboutScreen';
+import TermsScreen from './src/screens/TermsScreen';
 import SplashScreen from './src/components/SplashScreen';
 import { theme } from './src/constants/theme';
 
@@ -116,7 +120,14 @@ function RootNavigator() {
   const isLoggedIn = !!user.id;
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator 
+      screenOptions={{ 
+        headerShown: false,
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: {
+          paddingLeft: 10,
+        },
+      }}>
       {isLoggedIn ? (
         <>
           <Stack.Screen 
@@ -130,6 +141,66 @@ function RootNavigator() {
             options={{
               headerShown: true,
               title: '設定',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfileScreen}
+            options={{
+              headerShown: true,
+              title: '編輯個人資料',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="PrivacyPolicy" 
+            component={PrivacyPolicyScreen}
+            options={{
+              headerShown: true,
+              title: '隱私政策',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="About" 
+            component={AboutScreen}
+            options={{
+              headerShown: true,
+              title: '關於我們',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="Terms" 
+            component={TermsScreen}
+            options={{
+              headerShown: true,
+              title: '服務條款',
               headerStyle: {
                 backgroundColor: theme.colors.primary,
               },
@@ -157,6 +228,66 @@ function RootNavigator() {
             options={{
               headerShown: true,
               title: '設定',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfileScreen}
+            options={{
+              headerShown: true,
+              title: '編輯個人資料',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="PrivacyPolicy" 
+            component={PrivacyPolicyScreen}
+            options={{
+              headerShown: true,
+              title: '隱私政策',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="About" 
+            component={AboutScreen}
+            options={{
+              headerShown: true,
+              title: '關於我們',
+              headerStyle: {
+                backgroundColor: theme.colors.primary,
+              },
+              headerTintColor: theme.colors.surface,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          />
+          <Stack.Screen 
+            name="Terms" 
+            component={TermsScreen}
+            options={{
+              headerShown: true,
+              title: '服務條款',
               headerStyle: {
                 backgroundColor: theme.colors.primary,
               },

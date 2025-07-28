@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { toggleFavorite } from '../store/slices/restaurantSlice';
+import { toggleFavorite, addToBlacklist } from '../store/slices/restaurantSlice';
 import { theme } from '../constants/theme';
 import SpinWheel from '../components/SpinWheel';
 import RestaurantResultModal from '../components/RestaurantResultModal';
+import { RestaurantConfirmModal } from '../components/RestaurantConfirmModal';
 import { Restaurant } from '../types/restaurant';
 import ToggleButtonGroup from '../components/ToggleButtonGroup';
 
@@ -18,6 +19,7 @@ export default function SpinScreen() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [spinMode, setSpinMode] = useState<'wheelList' | 'favorites'>('wheelList');
 
   // 根據模式取得可用餐廳
@@ -78,6 +80,15 @@ export default function SpinScreen() {
     setTimeout(() => {
       // 轉盤會自動開始新的轉動
     }, 300);
+  };
+
+  const handleConfirmRestaurant = () => {
+    setShowResult(false);
+    setShowConfirm(true);
+  };
+
+  const handleAddToBlacklist = (restaurant: Restaurant) => {
+    dispatch(addToBlacklist(restaurant.id));
   };
 
   return (
@@ -145,9 +156,18 @@ export default function SpinScreen() {
       <RestaurantResultModal
         visible={showResult}
         restaurant={selectedRestaurant}
-        onClose={() => setShowResult(false)}
+        onClose={handleConfirmRestaurant}
         onRespin={handleRespin}
         onToggleFavorite={handleToggleFavorite}
+      />
+
+      <RestaurantConfirmModal
+        visible={showConfirm}
+        restaurant={selectedRestaurant}
+        onClose={() => setShowConfirm(false)}
+        onAddToFavorites={(restaurant) => dispatch(toggleFavorite(restaurant.id))}
+        onAddToBlacklist={handleAddToBlacklist}
+        isFavorite={selectedRestaurant ? favorites.includes(selectedRestaurant.id) : false}
       />
     </ScrollView>
   );

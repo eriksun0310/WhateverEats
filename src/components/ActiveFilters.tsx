@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, ScrollView, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { theme } from '../constants/theme';
+import { FilterButton } from './FilterButton';
 
 interface ActiveFiltersProps {
   selectedDistance: number | null;
@@ -22,48 +23,44 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   if (!showFilters) return null;
 
   return (
-    <View style={styles.activeFiltersContainer}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.activeFiltersWrapper}>
           {selectedDistance && (
-            <TouchableOpacity onPress={onPress} style={styles.activeFilterChip}>
-              <Text style={styles.activeFilterText}>
-                {selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
-              </Text>
-            </TouchableOpacity>
+            <FilterButton
+              label={selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
+              isActive={true}
+              onPress={onPress || (() => {})}
+              style={styles.filterButtonStyle}
+              textStyle={styles.filterTextStyle}
+            />
           )}
           {selectedCuisineTypes.map((cuisineType) => (
-            <TouchableOpacity key={cuisineType} onPress={onPress} style={styles.activeFilterChip}>
-              <Text style={styles.activeFilterText}>{cuisineType}</Text>
-            </TouchableOpacity>
+            <FilterButton
+              key={cuisineType}
+              label={cuisineType}
+              isActive={true}
+              onPress={onPress || (() => {})}
+              style={styles.filterButtonStyle}
+              textStyle={styles.filterTextStyle}
+            />
           ))}
         </View>
       </ScrollView>
-    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  activeFiltersContainer: {
-    // backgroundColor: theme.colors.surface,
-    paddingVertical: 8,
-    // borderBottomWidth: 1,
-    // borderBottomColor: theme.colors.border,
-  },
+
   activeFiltersWrapper: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    gap: 8,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
-  activeFilterChip: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+  filterButtonStyle: {
+    // 使用預設樣式
   },
-  activeFilterText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '600',
+  filterTextStyle: {
+    // 使用預設樣式
   },
 });

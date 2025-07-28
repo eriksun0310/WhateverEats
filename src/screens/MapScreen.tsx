@@ -23,6 +23,7 @@ import { Utensils, Navigation } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { ActiveFilters } from '../components/ActiveFilters';
 import { SearchBar } from '../components/SearchBar';
+import { shadows } from '../constants/shadows';
 
 const { width, height } = Dimensions.get('window');
 
@@ -193,7 +194,7 @@ export default function MapScreen() {
       </MapView>
 
       {/* 地圖控制按鈕 */}
-      <View style={[styles.mapControls, { bottom: selectedRestaurantData ? 320 : 100 }]}>
+      <View style={styles.mapControls}>
         <TouchableOpacity style={styles.locationButton} onPress={getCurrentLocation}>
           <Navigation size={24} color={theme.colors.surface} />
         </TouchableOpacity>
@@ -247,7 +248,7 @@ export default function MapScreen() {
       </View>
 
       {/* 頂部資訊欄 */}
-      <View style={[styles.topInfo, { top: (selectedCuisineTypes.length > 0 || selectedDistance !== null) ? 170 : 120 }]}>
+      <View style={[styles.topInfo, { top: (selectedCuisineTypes.length > 0 || selectedDistance !== null) ? 120 : 70 }]}>
         <Text style={styles.infoText}>
           顯示 {filteredRestaurants.length} 家餐廳
         </Text>
@@ -300,11 +301,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
     borderRadius: 20,
     padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...shadows.medium,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -314,6 +311,7 @@ const styles = StyleSheet.create({
   mapControls: {
     position: 'absolute',
     right: 20,
+    bottom: 100,
   },
   locationButton: {
     backgroundColor: theme.colors.primary,
@@ -322,28 +320,20 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    ...shadows.medium,
   },
   locationButtonText: {
     fontSize: 24,
   },
   topInfo: {
     position: 'absolute',
-    top: 60,
+    top: 10,
     alignSelf: 'center',
     backgroundColor: theme.colors.surface,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderRadius: theme.borderRadius.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    ...shadows.light,
   },
   infoText: {
     color: theme.colors.text.primary,
@@ -359,11 +349,7 @@ const styles = StyleSheet.create({
     maxHeight: height * 0.4,
     borderTopLeftRadius: theme.borderRadius.xl,
     borderTopRightRadius: theme.borderRadius.xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    ...shadows.top,
   },
   detailHeader: {
     flexDirection: 'row',
@@ -385,23 +371,19 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'absolute',
-    top: 60,
+    top: 10,
     left: 20,
     right: 20,
   },
   searchResultsContainer: {
     position: 'absolute',
-    top: 115,
+    top: 65,
     left: 20,
     right: 20,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.lg,
     maxHeight: 200,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
+    ...shadows.light,
   },
   searchResultItem: {
     padding: theme.spacing.md,
@@ -425,7 +407,7 @@ const styles = StyleSheet.create({
   },
   activeFiltersPositioner: {
     position: 'absolute',
-    top: 115,
+    top: 65,
     left: 0,
     right: 0,
     zIndex: 10,

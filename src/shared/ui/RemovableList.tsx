@@ -20,6 +20,7 @@ interface RemovableListProps {
   };
   renderHeader?: (item: any) => React.ReactNode;
   keyExtractor?: (item: any) => string;
+  onCardPress?: (item: any) => void;
 }
 
 export default function RemovableList({
@@ -27,6 +28,7 @@ export default function RemovableList({
   emptyStateProps,
   renderHeader,
   keyExtractor = (item) => item.id,
+  onCardPress,
 }: RemovableListProps) {
   return (
     <FlatList
@@ -35,7 +37,10 @@ export default function RemovableList({
       renderItem={({ item }) => (
         <View style={styles.cardWrapper}>
           {renderHeader && renderHeader(item)}
-          <RestaurantCard restaurant={item as Restaurant} />
+          <RestaurantCard 
+            restaurant={item as Restaurant}
+            onPress={onCardPress ? () => onCardPress(item) : undefined}
+          />
         </View>
       )}
       ListEmptyComponent={<EmptyState {...emptyStateProps} />}
