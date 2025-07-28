@@ -8,8 +8,9 @@ import {
   Dimensions,
   Platform,
   Alert,
-  TextInput,
   FlatList,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import { useSelector } from 'react-redux';
@@ -18,8 +19,10 @@ import { theme } from '../constants/theme';
 import RestaurantCard from '../components/RestaurantCard';
 import FilterBottomSheet from '../shared/ui/FilterBottomSheet';
 import { Restaurant } from '../types/restaurant';
-import { Utensils, Navigation, Search, Filter, X } from 'lucide-react-native';
+import { Utensils, Navigation } from 'lucide-react-native';
 import * as Location from 'expo-location';
+import { ActiveFilters } from '../components/ActiveFilters';
+import { SearchBar } from '../components/SearchBar';
 
 const { width, height } = Dimensions.get('window');
 
@@ -150,11 +153,16 @@ export default function MapScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* 地圖 */}
-      <MapView
-        ref={mapRef}
-        style={styles.map}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        {/* 地圖 */}
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          onPress={() => {
+            Keyboard.dismiss();
+            setShowSearchResults(false);
+          }}
         provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
         initialRegion={region}
         onRegionChangeComplete={setRegion}
@@ -192,42 +200,18 @@ export default function MapScreen() {
       </View>
 
       {/* 搜尋和篩選欄 */}
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Search size={20} color={theme.colors.text.secondary} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="搜尋餐廳名稱"
-            placeholderTextColor={theme.colors.text.secondary}
-            value={searchQuery}
-            onChangeText={(text) => {
-              setSearchQuery(text);
-              setShowSearchResults(text.length > 0);
-            }}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => {
-              setSearchQuery('');
-              setShowSearchResults(false);
-            }}>
-              <X size={20} color={theme.colors.text.secondary} />
-            </TouchableOpacity>
-          )}
-        </View>
-        <TouchableOpacity 
-          style={styles.filterButton} 
-          onPress={() => setShowFilterModal(true)}
-        >
-          <Filter size={20} color={theme.colors.surface} />
-          {(selectedCuisineTypes.length > 0 || selectedDistance !== null) && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>
-                {selectedCuisineTypes.length + (selectedDistance !== null ? 1 : 0)}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
+      <SearchBar
+        value={searchQuery}
+        onChangeText={(text) => {
+          setSearchQuery(text);
+          setShowSearchResults(text.length > 0);
+        }}
+        placeholder="搜尋餐廳名稱"
+        onFilterPress={() => setShowFilterModal(true)}
+        filterCount={selectedCuisineTypes.length + (selectedDistance !== null ? 1 : 0)}
+        onClear={() => setShowSearchResults(false)}
+        containerStyle={styles.searchContainer}
+      />
 
       {/* 搜尋結果列表 */}
       {showSearchResults && searchQuery.length > 0 && (
@@ -254,26 +238,13 @@ export default function MapScreen() {
       )}
 
       {/* 篩選條件顯示 */}
-      {(selectedCuisineTypes.length > 0 || selectedDistance !== null) && (
-        <View style={styles.activeFiltersContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.activeFiltersWrapper}>
-              {selectedDistance && (
-                <View style={styles.activeFilterChip}>
-                  <Text style={styles.activeFilterText}>
-                    {selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
-                  </Text>
-                </View>
-              )}
-              {selectedCuisineTypes.map((cuisineType) => (
-                <View key={cuisineType} style={styles.activeFilterChip}>
-                  <Text style={styles.activeFilterText}>{cuisineType}</Text>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-      )}
+      <View style={styles.activeFiltersPositioner}>
+        <ActiveFilters
+          selectedDistance={selectedDistance}
+          selectedCuisineTypes={selectedCuisineTypes}
+          onPress={() => setShowFilterModal(true)}
+        />
+      </View>
 
       {/* 頂部資訊欄 */}
       <View style={[styles.topInfo, { top: (selectedCuisineTypes.length > 0 || selectedDistance !== null) ? 170 : 120 }]}>
@@ -312,7 +283,8 @@ export default function MapScreen() {
         }}
         onApply={() => setShowFilterModal(false)}
       />
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -416,57 +388,6 @@ const styles = StyleSheet.create({
     top: 60,
     left: 20,
     right: 20,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing.md,
-    height: 45,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: theme.spacing.sm,
-    fontSize: 16,
-    color: theme.colors.text.primary,
-  },
-  filterButton: {
-    backgroundColor: theme.colors.primary,
-    width: 45,
-    height: 45,
-    borderRadius: theme.borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  filterBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: theme.colors.error,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filterBadgeText: {
-    color: theme.colors.surface,
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   searchResultsContainer: {
     position: 'absolute',
@@ -502,38 +423,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.text.secondary,
   },
-  activeFiltersContainer: {
+  activeFiltersPositioner: {
     position: 'absolute',
     top: 115,
     left: 0,
     right: 0,
-    backgroundColor: theme.colors.surface,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 3,
     zIndex: 10,
-  },
-  activeFiltersWrapper: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  activeFilterChip: {
-    backgroundColor: theme.colors.primary + '20',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  activeFilterText: {
-    fontSize: 14,
-    color: theme.colors.primary,
-    fontWeight: '500',
   },
 });

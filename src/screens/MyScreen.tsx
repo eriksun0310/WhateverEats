@@ -51,7 +51,7 @@ export default function MyScreen() {
 
   // 取得各類餐廳列表
   const wheelListRestaurants = restaurants.filter(r => wheelList.includes(r.id));
-  const favoriteRestaurants = restaurants.filter(r => favorites.includes(r.id));
+  const favoriteRestaurants = restaurants.filter(r => favorites.includes(r.id) && !blacklist.includes(r.id));
   const blacklistRestaurants = restaurants.filter(r => blacklist.includes(r.id));
   const recommendedRestaurants = user.friendRecommendations
     .map(rec => restaurants.find(r => r.id === rec.restaurantId))
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     backgroundColor: theme.colors.primary,
-    paddingTop: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.md,
     alignItems: 'center',
   },
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     backgroundColor: theme.colors.surface,
-    paddingTop: theme.spacing.sm,
+  
   },
   tabsWrapper: {
     flexDirection: 'row',

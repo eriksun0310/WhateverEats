@@ -10,7 +10,7 @@ import {
 import { theme } from '../constants/theme';
 
 const { width } = Dimensions.get('window');
-const WHEEL_SIZE = width * 0.8;
+const WHEEL_SIZE = width * 0.75;
 
 interface SpinWheelProps {
   onSpinComplete: () => void;
@@ -54,14 +54,14 @@ export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: S
 
   // 分段顏色 - 使用舒適且有層次的配色
   const segments = [
-    { color: '#FF8B94' }, // 珊瑚粉
-    { color: '#FFD3B6' }, // 蜜桃橘
-    { color: '#FFAAA5' }, // 鮭魚粉
-    { color: '#8FCACA' }, // 薄荷綠
-    { color: '#A8DADC' }, // 粉藍色
-    { color: '#F1E0A5' }, // 奶油黃
-    { color: '#B2B2E0' }, // 薰衣草紫
+    { color: '#FF6F3C' }, // 主題橘
+    { color: '#FFA74F' }, // 亮橘
+    { color: '#FFD93D' }, // 金黃
+    { color: '#6BCF7F' }, // 薄荷綠
+    { color: '#4ECDC4' }, // 青綠
+    { color: '#95E1D3' }, // 淺綠
     { color: '#FFB6B9' }, // 玫瑰粉
+    { color: '#FEC8D8' }, // 淺粉
   ];
 
   return (
@@ -115,15 +115,25 @@ const styles = StyleSheet.create({
     width: WHEEL_SIZE,
     height: WHEEL_SIZE,
     position: 'relative',
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
   },
   wheel: {
     width: WHEEL_SIZE,
     height: WHEEL_SIZE,
     borderRadius: WHEEL_SIZE / 2,
-    backgroundColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     overflow: 'hidden',
     position: 'relative',
+    borderWidth: 8,
+    borderColor: theme.colors.surface,
   },
   segment: {
     position: 'absolute',
@@ -133,42 +143,56 @@ const styles = StyleSheet.create({
     top: WHEEL_SIZE / 4,
     transformOrigin: 'right center',
   },
-  segmentEmoji: {
-    position: 'absolute',
-    left: 20,
-    top: '40%',
-    fontSize: 24,
-  },
   pointer: {
     position: 'absolute',
-    top: -20,
+    bottom: -20,
     left: WHEEL_SIZE / 2 - 20,
     width: 40,
     height: 40,
     alignItems: 'center',
+    zIndex: 10,
+    transform: [{ rotate: '180deg' }],
   },
   pointerTriangle: {
     width: 0,
     height: 0,
     borderLeftWidth: 20,
     borderRightWidth: 20,
-    borderTopWidth: 40,
+    borderTopWidth: 35,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: theme.colors.error,
+    borderTopColor: theme.colors.primary,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   spinButton: {
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.xl,
+    paddingHorizontal: theme.spacing.xl * 2,
+    paddingVertical: theme.spacing.md + 4,
+    borderRadius: theme.borderRadius.full,
+    shadowColor: theme.colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   spinButtonDisabled: {
-    backgroundColor: theme.colors.text.light,
+    backgroundColor: theme.colors.border,
+    shadowOpacity: 0.1,
   },
   spinButtonText: {
     color: theme.colors.surface,
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });

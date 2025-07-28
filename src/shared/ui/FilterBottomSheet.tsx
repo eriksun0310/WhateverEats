@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { X } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
+import FilterButtonGroup from '../../components/FilterButtonGroup';
 
 const { height } = Dimensions.get('window');
 
@@ -81,27 +82,13 @@ export default function FilterBottomSheet({
             {/* 距離範圍 */}
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>距離範圍</Text>
-              <View style={styles.buttonContainer}>
-                {DISTANCE_OPTIONS.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.filterButton,
-                      selectedDistance === option.value && styles.filterButtonActive
-                    ]}
-                    onPress={() => onDistanceSelect(
-                      selectedDistance === option.value ? null : option.value
-                    )}
-                  >
-                    <Text style={[
-                      styles.filterButtonText,
-                      selectedDistance === option.value && styles.filterButtonTextActive
-                    ]}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <FilterButtonGroup
+                options={DISTANCE_OPTIONS}
+                selectedValues={selectedDistance ? [selectedDistance] : []}
+                onToggle={(value) => onDistanceSelect(value as number | null)}
+                multiple={false}
+                containerStyle={styles.buttonContainer}
+              />
             </View>
             
             <View style={styles.filterDivider} />
@@ -109,25 +96,13 @@ export default function FilterBottomSheet({
             {/* 料理類型 */}
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>料理類型</Text>
-              <View style={styles.buttonContainer}>
-                {displayCuisineTypes.map((cuisineType) => (
-                  <TouchableOpacity
-                    key={cuisineType}
-                    style={[
-                      styles.filterButton,
-                      selectedCuisineTypes.includes(cuisineType) && styles.filterButtonActive
-                    ]}
-                    onPress={() => onCuisineTypeToggle(cuisineType)}
-                  >
-                    <Text style={[
-                      styles.filterButtonText,
-                      selectedCuisineTypes.includes(cuisineType) && styles.filterButtonTextActive
-                    ]}>
-                      {cuisineType}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <FilterButtonGroup
+                options={displayCuisineTypes}
+                selectedValues={selectedCuisineTypes}
+                onToggle={(value) => onCuisineTypeToggle(value as string)}
+                multiple={true}
+                containerStyle={styles.buttonContainer}
+              />
             </View>
           </ScrollView>
           
@@ -164,13 +139,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: theme.borderRadius.xl,
     borderTopRightRadius: theme.borderRadius.xl,
-    height: height * 0.7,
+    height: height * 0.6,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
@@ -183,52 +158,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filterSection: {
-    paddingTop: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
   },
   filterSectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
   },
   filterDivider: {
     height: 1,
     backgroundColor: theme.colors.border,
     marginHorizontal: theme.spacing.lg,
   },
-  filterButton: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
-    marginBottom: theme.spacing.sm,
-  },
-  filterButtonActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
-  },
-  filterButtonText: {
-    fontSize: 14,
-    color: theme.colors.text.primary,
-    fontWeight: '500',
-  },
-  filterButtonTextActive: {
-    color: theme.colors.surface,
-    fontWeight: '600',
-  },
   modalFooter: {
     flexDirection: 'row',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
@@ -239,30 +189,30 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     flex: 1,
-    paddingVertical: theme.spacing.lg,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 2,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1.5,
     borderColor: theme.colors.primary,
     alignItems: 'center',
-    marginRight: theme.spacing.sm,
+    marginRight: theme.spacing.xs,
   },
   clearButtonText: {
     color: theme.colors.primary,
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 15,
   },
   applyButton: {
     flex: 1,
-    paddingVertical: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: theme.borderRadius.md,
     alignItems: 'center',
-    marginLeft: theme.spacing.sm,
+    marginLeft: theme.spacing.xs,
   },
   applyButtonText: {
     color: theme.colors.surface,
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: 15,
   },
   emptyText: {
     fontSize: 14,

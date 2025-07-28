@@ -141,3 +141,7 @@ npm install react-native-share
 4. RestaurantCard 元件可重複使用於多個頁面
 
 這個架構提供了良好的擴充性，可以輕鬆加入新功能或修改現有功能。
+
+
+- 電子郵件: test@example.com
+- 密碼: password

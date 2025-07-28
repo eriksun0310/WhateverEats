@@ -16,6 +16,7 @@ import { AppDispatch } from '../store';
 import { setUser } from '../store/slices/userSlice';
 import { theme } from '../constants/theme';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
+import { AuthService } from '../services/authService';
 
 interface LoginScreenProps {
   navigation: any;
@@ -36,24 +37,23 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
     setLoading(true);
     
-    // 模擬登入（實際應連接 API）
-    setTimeout(() => {
-      // 假設登入成功
-      if (email === 'test@example.com' && password === 'password') {
-        dispatch(setUser({
-          id: '1',
-          email: email,
-          name: '測試用戶',
-          avatar: 'default',
-        }));
-        
+    try {
+      // 登入
+      const userData = await AuthService.login(email, password);
+      
+      if (userData) {
+        // 更新 Redux 狀態
+        dispatch(setUser(userData));
         // 導航到主畫面
         navigation.replace('MainTabs');
       } else {
         Alert.alert('登入失敗', '電子郵件或密碼錯誤');
       }
+    } catch (error) {
+      Alert.alert('登入失敗', '請稍後再試');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

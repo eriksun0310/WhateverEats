@@ -30,7 +30,7 @@ export default function EmptyState({ title, subtitle, action }: EmptyStateProps)
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.xl * 2,
+    paddingVertical: theme.spacing.lg,
   },
   title: {
     fontSize: 18,
@@ -46,16 +46,16 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     backgroundColor: theme.colors.primary,
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
   actionButtonText: {
     color: theme.colors.surface,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
 });

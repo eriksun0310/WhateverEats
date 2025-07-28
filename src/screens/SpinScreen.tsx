@@ -7,6 +7,7 @@ import { theme } from '../constants/theme';
 import SpinWheel from '../components/SpinWheel';
 import RestaurantResultModal from '../components/RestaurantResultModal';
 import { Restaurant } from '../types/restaurant';
+import ToggleButtonGroup from '../components/ToggleButtonGroup';
 
 export default function SpinScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -87,32 +88,15 @@ export default function SpinScreen() {
       </View>
 
       {/* 模式切換器 */}
-      <View style={styles.modeSelector}>
-        <TouchableOpacity
-          style={[
-            styles.modeButton,
-            spinMode === 'wheelList' && styles.modeButtonActive
-          ]}
-          onPress={() => setSpinMode('wheelList')}
-        >
-          <Text style={[
-            styles.modeButtonText,
-            spinMode === 'wheelList' && styles.modeButtonTextActive
-          ]}>轉盤名單</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.modeButton,
-            spinMode === 'favorites' && styles.modeButtonActive
-          ]}
-          onPress={() => setSpinMode('favorites')}
-        >
-          <Text style={[
-            styles.modeButtonText,
-            spinMode === 'favorites' && styles.modeButtonTextActive
-          ]}>口袋名單</Text>
-        </TouchableOpacity>
-      </View>
+      <ToggleButtonGroup
+        options={[
+          { value: 'wheelList', label: '轉盤名單' },
+          { value: 'favorites', label: '口袋名單' },
+        ]}
+        value={spinMode}
+        onChange={setSpinMode}
+        containerStyle={styles.modeSelector}
+      />
 
       {/* 檢查模式是否有餐廳 */}
       {((spinMode === 'wheelList' && wheelList.length === 0) || 
@@ -180,7 +164,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: theme.spacing.xl,
+    // marginBottom: theme.spacing.xl,
   },
   title: {
     fontSize: 28,
@@ -214,43 +198,14 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
   },
   modeSelector: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.border,
-    borderRadius: theme.borderRadius.full,
-    padding: 2,
     marginHorizontal: theme.spacing.xl,
-    marginBottom: theme.spacing.lg,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm + 2,
-    alignItems: 'center',
-    borderRadius: theme.borderRadius.full,
-    marginHorizontal: 2,
-  },
-  modeButtonActive: {
-    backgroundColor: theme.colors.surface,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  modeButtonText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.text.secondary,
-  },
-  modeButtonTextActive: {
-    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+    marginTop: theme.spacing.md,
   },
   emptyFavorites: {
     alignItems: 'center',
-    paddingVertical: theme.spacing.xl * 2,
-    marginVertical: theme.spacing.xl,
+    paddingVertical: theme.spacing.lg,
+    marginVertical: theme.spacing.md,
   },
   emptyTitle: {
     fontSize: 20,

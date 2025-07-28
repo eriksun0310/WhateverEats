@@ -16,6 +16,7 @@ import { setUser } from '../store/slices/userSlice';
 import { theme } from '../constants/theme';
 import { Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
 import { Image } from 'react-native';
+import { AuthService } from '../services/authService';
 
 const avatarOptions = [
   { id: 'dog', image: require('../../assets/image/dog.png'), label: '老實說狗狗' },
@@ -73,22 +74,30 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
 
     setLoading(true);
     
-    // 模擬註冊（實際應連接 API）
-    setTimeout(() => {
-      // 假設註冊成功
-      dispatch(setUser({
-        id: Date.now().toString(),
-        email: form.email,
+    try {
+      // 註冊新用戶
+      await AuthService.register({
         name: form.name,
+        email: form.email,
+        password: form.password,
         avatar: selectedAvatar,
-      }));
+        friendRecommendations: [],
+      });
+      
+      // 獲取用戶資料並更新 Redux
+      const userData = await AuthService.getCurrentUser();
+      if (userData) {
+        dispatch(setUser(userData));
+      }
       
       Alert.alert('註冊成功', '歡迎加入隨便吃！', [
         { text: '開始使用', onPress: () => navigation.replace('MainTabs') }
       ]);
-      
+    } catch (error: any) {
+      Alert.alert('註冊失敗', error.message || '請稍後再試');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (

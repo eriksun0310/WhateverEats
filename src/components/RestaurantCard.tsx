@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 180,
+    height: 150,
     backgroundColor: theme.colors.border,
   },
   infoContainer: {

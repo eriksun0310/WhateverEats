@@ -118,7 +118,3 @@ npx expo start --port 8082
 3. 加入 AsyncStorage 儲存使用者偏好
 4. 實作推播通知功能
 
-## 問題排除
-- Port 8081 被佔用：使用 `--port 8082` 參數
-- 圖標顯示問題：確認使用 Emoji 而非 vector-icons
-- TypeScript 錯誤：檢查 tsconfig.json 設定

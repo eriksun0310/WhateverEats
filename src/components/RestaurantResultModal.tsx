@@ -133,20 +133,29 @@ export default function RestaurantResultModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    padding: theme.spacing.lg,
   },
   modal: {
     backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-    maxHeight: '90%',
+    borderRadius: theme.borderRadius.xl,
+    maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 10,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: theme.spacing.md,
+    padding: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -154,9 +163,10 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: theme.colors.text.primary,
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.primary,
+    letterSpacing: 0.5,
   },
   closeButton: {
     padding: theme.spacing.sm,
@@ -167,11 +177,16 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 220,
     backgroundColor: theme.colors.border,
+    borderRadius: theme.borderRadius.lg,
+    marginHorizontal: theme.spacing.md,
+    width: `100% - ${theme.spacing.md * 2}px`,
+    alignSelf: 'center',
   },
   infoContainer: {
-    padding: theme.spacing.md,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
   },
   nameRow: {
     flexDirection: 'row',
@@ -180,10 +195,11 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   restaurantName: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
     color: theme.colors.text.primary,
     flex: 1,
+    letterSpacing: 0.5,
   },
   favoriteIcon: {
     fontSize: 28,
@@ -191,9 +207,11 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.lg,
+    borderRadius: theme.borderRadius.md,
     padding: theme.spacing.md,
     marginBottom: theme.spacing.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   detailRow: {
     flexDirection: 'row',
@@ -237,15 +255,18 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    padding: theme.spacing.md,
-    gap: theme.spacing.sm,
+    padding: theme.spacing.lg,
+    paddingTop: 0,
+    gap: theme.spacing.md,
   },
   respinButton: {
     flex: 1,
-    backgroundColor: theme.colors.border,
-    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    paddingVertical: theme.spacing.md + 2,
     borderRadius: theme.borderRadius.lg,
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
   },
   buttonContent: {
     flexDirection: 'row',
@@ -254,19 +275,27 @@ const styles = StyleSheet.create({
   },
   respinButtonText: {
     fontSize: 16,
-    color: theme.colors.text.primary,
-    fontWeight: '600',
+    color: theme.colors.primary,
+    fontWeight: '700',
   },
   confirmButton: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.md + 2,
     borderRadius: theme.borderRadius.lg,
     alignItems: 'center',
+    shadowColor: theme.colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   confirmButtonText: {
     fontSize: 16,
     color: theme.colors.surface,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

@@ -3,8 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   FlatList,
 } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -12,7 +10,8 @@ import { RootState } from '../store';
 import { theme } from '../constants/theme';
 import RestaurantCard from '../components/RestaurantCard';
 import FilterBottomSheet from '../shared/ui/FilterBottomSheet';
-import { Search, Filter } from 'lucide-react-native';
+import { ActiveFilters } from '../components/ActiveFilters';
+import { SearchBar } from '../components/SearchBar';
 
 export default function ExploreScreen() {
   const { restaurants, blacklist } = useSelector(
@@ -78,50 +77,24 @@ export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>探索餐廳</Text>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="搜尋區域或餐廳..."
-            placeholderTextColor={theme.colors.text.light}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => setShowFilters(true)}
-          >
-            <Filter size={20} color={theme.colors.surface} />
-            {activeFiltersCount > 0 && (
-              <View style={styles.filterBadge}>
-                <Text style={styles.filterBadgeText}>{activeFiltersCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
+
+        <SearchBar
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="搜尋餐廳名稱"
+          onFilterPress={() => setShowFilters(true)}
+          filterCount={activeFiltersCount}
+          containerStyle={styles.searchContainer}
+        />
       </View>
 
       {/* 篩選條件顯示 */}
-      {activeFiltersCount > 0 && (
-        <View style={styles.activeFiltersContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.activeFiltersWrapper}>
-              {selectedDistance && (
-                <View style={styles.activeFilterChip}>
-                  <Text style={styles.activeFilterText}>
-                    {selectedDistance < 1000 ? `${selectedDistance}公尺內` : `${selectedDistance / 1000}公里內`}
-                  </Text>
-                </View>
-              )}
-              {selectedCuisineTypes.map((cuisineType) => (
-                <View key={cuisineType} style={styles.activeFilterChip}>
-                  <Text style={styles.activeFilterText}>{cuisineType}</Text>
-                </View>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-      )}
+      <ActiveFilters
+        selectedDistance={selectedDistance}
+        selectedCuisineTypes={selectedCuisineTypes}
+        activeFiltersCount={activeFiltersCount}
+        onPress={() => setShowFilters(true)}
+      />
 
       <FilterBottomSheet
         visible={showFilters}
@@ -159,7 +132,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
+    // backgroundColor: theme.colors.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -173,65 +146,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   searchContainer: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    fontSize: 16,
-    color: theme.colors.text.primary,
-  },
-  filterButton: {
-    backgroundColor: theme.colors.primary,
-    width: 45,
-    height: 45,
-    borderRadius: theme.borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filterBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: theme.colors.error,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  filterBadgeText: {
-    color: theme.colors.surface,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  activeFiltersContainer: {
-    backgroundColor: theme.colors.surface,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  activeFiltersWrapper: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  activeFilterChip: {
-    backgroundColor: theme.colors.primary + '20',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-  },
-  activeFilterText: {
-    fontSize: 14,
-    color: theme.colors.primary,
-    fontWeight: '500',
+    marginBottom: theme.spacing.md,
   },
   listContent: {
     padding: theme.spacing.md,
@@ -240,7 +155,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: theme.spacing.xl * 2,
+    paddingVertical: theme.spacing.lg,
   },
   emptyText: {
     fontSize: 18,
