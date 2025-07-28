@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.xl,
-    maxHeight: '85%',
+    maxHeight: '75%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 220,
+    height: 120,
     backgroundColor: theme.colors.border,
     borderRadius: theme.borderRadius.lg,
     marginHorizontal: theme.spacing.md,
@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   infoContainer: {
-    padding: theme.spacing.lg,
-    paddingTop: theme.spacing.md,
+    padding: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
   },
   nameRow: {
     flexDirection: 'row',

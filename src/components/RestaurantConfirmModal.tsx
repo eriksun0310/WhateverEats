@@ -11,6 +11,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { Heart, Dices, Ban, Share2, X } from 'lucide-react-native';
 import { Restaurant } from '../types';
 import { theme } from '../constants/theme';
 import Button from './Button';
@@ -20,18 +21,24 @@ interface RestaurantConfirmModalProps {
   visible: boolean;
   restaurant: Restaurant | null;
   onClose: () => void;
-  onAddToFavorites: (restaurant: Restaurant) => void;
-  onAddToBlacklist: (restaurant: Restaurant) => void;
+  onToggleFavorite: () => void;
+  onToggleWheelList: () => void;
+  onToggleBlacklist: () => void;
   isFavorite: boolean;
+  isInWheelList: boolean;
+  isBlacklisted: boolean;
 }
 
 export const RestaurantConfirmModal: React.FC<RestaurantConfirmModalProps> = ({
   visible,
   restaurant,
   onClose,
-  onAddToFavorites,
-  onAddToBlacklist,
+  onToggleFavorite,
+  onToggleWheelList,
+  onToggleBlacklist,
   isFavorite,
+  isInWheelList,
+  isBlacklisted,
 }) => {
   if (!restaurant) return null;
 
@@ -59,30 +66,19 @@ export const RestaurantConfirmModal: React.FC<RestaurantConfirmModalProps> = ({
     Alert.alert('分享功能', '即將推出！');
   };
 
-  const handleAddToFavorites = () => {
-    onAddToFavorites(restaurant);
-    Alert.alert('成功', isFavorite ? '已從收藏中移除' : '已加入收藏');
-  };
-
-  const handleAddToBlacklist = () => {
-    Alert.alert(
-      '加入黑名單',
-      '確定要將此餐廳加入黑名單嗎？',
-      [
-        { text: '取消', style: 'cancel' },
-        {
-          text: '確定',
-          onPress: () => {
-            onAddToBlacklist(restaurant);
-            onClose();
-          },
-        },
-      ]
-    );
-  };
-
-  const handleSpinAgain = () => {
-    onClose();
+  const handleToggleBlacklist = () => {
+    if (!isBlacklisted) {
+      Alert.alert(
+        '加入黑名單',
+        '確定要將此餐廳加入黑名單嗎？\n黑名單中的餐廳不會出現在轉盤中。',
+        [
+          { text: '取消', style: 'cancel' },
+          { text: '確定', onPress: onToggleBlacklist },
+        ]
+      );
+    } else {
+      onToggleBlacklist();
+    }
   };
 
   return (
@@ -99,13 +95,53 @@ export const RestaurantConfirmModal: React.FC<RestaurantConfirmModalProps> = ({
           onPress={onClose}
         />
         <View style={styles.modalContent}>
+          {/* 關閉按鈕 */}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={onClose}
+          >
+            <X size={24} color={theme.colors.text.secondary} />
+          </TouchableOpacity>
+          
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* 餐廳圖片 */}
             <Image source={{ uri: restaurant.imageUrl || 'https://via.placeholder.com/400x200' }} style={styles.restaurantImage} />
             
             {/* 餐廳資訊 */}
             <View style={styles.infoContainer}>
-              <Text style={styles.restaurantName}>{restaurant.name}</Text>
+              <View style={styles.headerRow}>
+                <Text style={styles.restaurantName}>{restaurant.name}</Text>
+                
+                {/* 圖標按鈕組 */}
+                <View style={styles.iconButtons}>
+                  <TouchableOpacity onPress={onToggleFavorite} style={styles.iconButton}>
+                    <Heart 
+                      size={22} 
+                      color={isFavorite ? theme.colors.error : theme.colors.text.light}
+                      fill={isFavorite ? theme.colors.error : 'transparent'}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={onToggleWheelList} style={styles.iconButton}>
+                    <Dices 
+                      size={22} 
+                      color={isInWheelList ? theme.colors.primary : theme.colors.text.light}
+                      fill={isInWheelList ? theme.colors.primary : 'transparent'}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleToggleBlacklist} style={styles.iconButton}>
+                    <Ban 
+                      size={22} 
+                      color={isBlacklisted ? theme.colors.error : theme.colors.text.light}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleShare} style={styles.iconButton}>
+                    <Share2 
+                      size={22} 
+                      color={theme.colors.text.secondary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
               
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>⭐ {restaurant.rating}</Text>
@@ -132,49 +168,16 @@ export const RestaurantConfirmModal: React.FC<RestaurantConfirmModalProps> = ({
               <Button
                 title="🗺️ 導航前往"
                 variant="primary"
+                size="large"
                 onPress={handleNavigation}
                 containerStyle={styles.mainButton}
               />
               <Button
                 title="📞 撥打電話"
                 variant="primary"
+                size="large"
                 onPress={handleCall}
                 containerStyle={styles.mainButton}
-              />
-            </View>
-
-            {/* 次要行動按鈕 */}
-            <View style={styles.secondaryActions}>
-              <TouchableOpacity
-                style={styles.secondaryButton}
-                onPress={handleAddToFavorites}
-              >
-                <Text style={styles.secondaryButtonText}>
-                  {isFavorite ? '❤️ 已收藏' : '🤍 加入收藏'}
-                </Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={styles.secondaryButton}
-                onPress={handleShare}
-              >
-                <Text style={styles.secondaryButtonText}>📤 分享給朋友</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* 底部按鈕 */}
-            <View style={styles.bottomActions}>
-              <Button
-                title="不想吃這家"
-                variant="outline"
-                onPress={handleAddToBlacklist}
-                containerStyle={{ flex: 1, marginRight: 8 }}
-              />
-              <Button
-                title="再轉一次"
-                variant="secondary"
-                onPress={handleSpinAgain}
-                containerStyle={{ flex: 1, marginLeft: 8 }}
               />
             </View>
           </ScrollView>
@@ -198,7 +201,18 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: theme.borderRadius.xl,
     borderTopRightRadius: theme.borderRadius.xl,
     maxHeight: '85%',
+    position: 'relative',
     ...shadows.large,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: theme.spacing.md,
+    right: theme.spacing.md,
+    zIndex: 10,
+    padding: theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.full,
+    ...shadows.light,
   },
   restaurantImage: {
     width: '100%',
@@ -209,11 +223,25 @@ const styles = StyleSheet.create({
   infoContainer: {
     padding: theme.spacing.lg,
   },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.md,
+  },
   restaurantName: {
     fontSize: 24,
     fontWeight: '700',
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.sm,
+    flex: 1,
+    marginRight: theme.spacing.sm,
+  },
+  iconButtons: {
+    flexDirection: 'row',
+    gap: theme.spacing.xs,
+  },
+  iconButton: {
+    padding: theme.spacing.xs,
   },
   infoRow: {
     flexDirection: 'row',
@@ -255,33 +283,10 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl,
     gap: theme.spacing.md,
-    marginBottom: theme.spacing.md,
   },
   mainButton: {
     flex: 1,
-  },
-  secondaryActions: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.lg,
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
-  },
-  secondaryButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.background,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    color: theme.colors.text.primary,
-    fontWeight: '500',
-  },
-  bottomActions: {
-    flexDirection: 'row',
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.xl,
   },
 });

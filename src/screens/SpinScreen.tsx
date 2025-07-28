@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
-import { toggleFavorite, addToBlacklist } from '../store/slices/restaurantSlice';
+import { toggleFavorite, addToBlacklist, toggleWheelList } from '../store/slices/restaurantSlice';
 import { theme } from '../constants/theme';
 import SpinWheel from '../components/SpinWheel';
 import RestaurantResultModal from '../components/RestaurantResultModal';
@@ -87,10 +87,6 @@ export default function SpinScreen() {
     setShowConfirm(true);
   };
 
-  const handleAddToBlacklist = (restaurant: Restaurant) => {
-    dispatch(addToBlacklist(restaurant.id));
-  };
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
@@ -165,9 +161,12 @@ export default function SpinScreen() {
         visible={showConfirm}
         restaurant={selectedRestaurant}
         onClose={() => setShowConfirm(false)}
-        onAddToFavorites={(restaurant) => dispatch(toggleFavorite(restaurant.id))}
-        onAddToBlacklist={handleAddToBlacklist}
+        onToggleFavorite={() => selectedRestaurant && dispatch(toggleFavorite(selectedRestaurant.id))}
+        onToggleWheelList={() => selectedRestaurant && dispatch(toggleWheelList(selectedRestaurant.id))}
+        onToggleBlacklist={() => selectedRestaurant && dispatch(addToBlacklist(selectedRestaurant.id))}
         isFavorite={selectedRestaurant ? favorites.includes(selectedRestaurant.id) : false}
+        isInWheelList={selectedRestaurant ? wheelList.includes(selectedRestaurant.id) : false}
+        isBlacklisted={selectedRestaurant ? blacklist.includes(selectedRestaurant.id) : false}
       />
     </ScrollView>
   );
