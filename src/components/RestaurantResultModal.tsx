@@ -148,35 +148,11 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: theme.spacing.sm,
   },
-  closeText: {
-    fontSize: 24,
-    color: theme.colors.text.secondary,
-  },
   restaurantInfoWrapper: {
     overflow: 'hidden',
   },
-  addressContainer: {
-    paddingHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-  },
-  addressLabelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    marginBottom: theme.spacing.xs,
-  },
-  addressLabel: {
-    fontSize: 16,
-    color: theme.colors.text.secondary,
-  },
-  address: {
-    fontSize: 16,
-    color: theme.colors.primary,
-    lineHeight: 22,
-    textDecorationLine: 'underline',
-  },
   buttonContainer: {
     padding: theme.spacing.lg,
-    paddingTop: 0,
+    paddingTop: theme.spacing.xs,
   },
 });

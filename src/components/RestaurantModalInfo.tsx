@@ -42,9 +42,9 @@ export const RestaurantModalInfo: React.FC<RestaurantModalInfoProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    
-    paddingVertical: theme.spacing.md,
-    gap: theme.spacing.md,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    gap: theme.spacing.lg,
   },
   infoRow: {
     flexDirection: 'row',

@@ -132,8 +132,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: theme.borderRadius.xl,
     maxHeight: '85%',
     position: 'relative',
-    ...shadows.large,
-
   },
   closeButton: {
     position: 'absolute',

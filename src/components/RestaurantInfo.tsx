@@ -136,13 +136,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.border,
   },
   infoContainer: {
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
   },
   name: {
     fontSize: 18,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   },
   detailsRow: {
     flexDirection: 'row',
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
   },
   cuisine: {
     fontSize: 14,
