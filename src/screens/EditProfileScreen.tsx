@@ -19,7 +19,7 @@ import { AuthService } from '../services/authService';
 import { theme } from '../constants/theme';
 import { User, Camera } from 'lucide-react-native';
 import FormInput from '../components/FormInput';
-import Button from '../components/Button';
+import { DualButtonGroup } from '../components/DualButtonGroup';
 
 const avatarOptions = [
   { id: 'dog', image: require('../../assets/image/dog.png'), label: '老實說狗狗' },
@@ -120,18 +120,19 @@ export default function EditProfileScreen() {
 
         {/* 操作按鈕 */}
         <View style={styles.actions}>
-          <Button
-            title="儲存變更"
-            onPress={handleSave}
-            loading={loading}
+          <DualButtonGroup
+            leftButton={{
+              title: '取消',
+              onPress: () => navigation.goBack(),
+              variant: 'outline',
+            }}
+            rightButton={{
+              title: '儲存變更',
+              onPress: handleSave,
+              variant: 'primary',
+              loading: loading,
+            }}
           />
-          
-          <TouchableOpacity 
-            style={styles.cancelButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={styles.cancelButtonText}>取消</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -219,15 +220,5 @@ const styles = StyleSheet.create({
   },
   actions: {
     padding: theme.spacing.lg,
-    gap: theme.spacing.md,
-
-  },
-  cancelButton: {
-    alignItems: 'center',
-    paddingVertical: theme.spacing.md,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    color: theme.colors.text.secondary,
   },
 });

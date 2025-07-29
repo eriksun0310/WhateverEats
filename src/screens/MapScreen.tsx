@@ -356,8 +356,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    // borderBottomWidth: 1,
+    // borderBottomColor: theme.colors.border,
   },
   detailTitle: {
     fontSize: 18,

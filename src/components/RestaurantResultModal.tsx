@@ -5,12 +5,16 @@ import {
   StyleSheet,
   Modal,
   TouchableOpacity,
-  Image,
   ScrollView,
+  Linking,
+  Alert,
+  Platform,
 } from 'react-native';
 import { Restaurant } from '../types/restaurant';
 import { theme } from '../constants/theme';
-import { PartyPopper, X, Heart, Star, MapPin, Dices } from 'lucide-react-native';
+import { PartyPopper, X, MapPin, Dices } from 'lucide-react-native';
+import { DualButtonGroup } from './DualButtonGroup';
+import { RestaurantInfo } from './RestaurantInfo';
 
 interface RestaurantResultModalProps {
   visible: boolean;
@@ -29,8 +33,18 @@ export default function RestaurantResultModal({
 }: RestaurantResultModalProps) {
   if (!restaurant) return null;
 
-  const renderPriceLevel = () => {
-    return '$'.repeat(restaurant.priceLevel);
+  const handleNavigation = () => {
+    const { latitude, longitude } = restaurant;
+    const label = encodeURIComponent(restaurant.name);
+    
+    const url = Platform.select({
+      ios: `maps:0,0?q=${label}@${latitude},${longitude}`,
+      android: `geo:0,0?q=${latitude},${longitude}(${label})`,
+    });
+
+    Linking.openURL(url).catch((err) => {
+      Alert.alert('無法開啟地圖', '請確認是否安裝地圖應用程式');
+    });
   };
 
   return (
@@ -54,74 +68,37 @@ export default function RestaurantResultModal({
               </TouchableOpacity>
             </View>
 
-            {/* 餐廳圖片 */}
-            <Image source={{ uri: restaurant.imageUrl }} style={styles.image} />
-
-            {/* 餐廳資訊 */}
-            <View style={styles.infoContainer}>
-              <View style={styles.nameRow}>
-                <Text style={styles.restaurantName}>{restaurant.name}</Text>
-                {onToggleFavorite && (
-                  <TouchableOpacity onPress={onToggleFavorite}>
-                    <Heart 
-                      size={28} 
-                      color={restaurant.isFavorite ? theme.colors.error : theme.colors.text.light}
-                      fill={restaurant.isFavorite ? theme.colors.error : 'transparent'}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={styles.detailsContainer}>
-                <View style={styles.detailRow}>
-                  <Text style={styles.label}>類型</Text>
-                  <Text style={styles.value}>{restaurant.cuisineType}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.label}>價位</Text>
-                  <Text style={[styles.value, styles.price]}>
-                    {renderPriceLevel()}
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.label}>評分</Text>
-                  <View style={styles.ratingContainer}>
-                    <Star size={16} color={theme.colors.warning} fill={theme.colors.warning} />
-                    <Text style={styles.value}>{restaurant.rating}</Text>
-                  </View>
-                </View>
-                {restaurant.distance && (
-                  <View style={styles.detailRow}>
-                    <Text style={styles.label}>距離</Text>
-                    <Text style={styles.value}>
-                      {restaurant.distance < 1000
-                        ? `${restaurant.distance}m`
-                        : `${(restaurant.distance / 1000).toFixed(1)}km`}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              <View style={styles.addressContainer}>
-                <View style={styles.addressLabelContainer}>
-                  <MapPin size={16} color={theme.colors.primary} />
-                  <Text style={styles.addressLabel}>地址</Text>
-                </View>
-                <Text style={styles.address}>{restaurant.address}</Text>
-              </View>
+            {/* 餐廳資訊 - 使用 RestaurantInfo 而非完整的 Card */}
+            <View style={styles.restaurantInfoWrapper}>
+              <RestaurantInfo
+                restaurant={restaurant}
+                showImage={true}
+                showActions={true}
+                isFavorite={restaurant.isFavorite}
+                onToggleFavorite={onToggleFavorite}
+                variant="modal"
+                imageHeight={180}
+              />
             </View>
+
+           
+    
 
             {/* 按鈕區 */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.respinButton} onPress={onRespin}>
-                <View style={styles.buttonContent}>
-                  <Dices size={20} color={theme.colors.primary} />
-                  <Text style={styles.respinButtonText}>重新轉一次</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.confirmButton} onPress={onClose}>
-                <Text style={styles.confirmButtonText}>就吃這家！</Text>
-              </TouchableOpacity>
+              <DualButtonGroup
+                leftButton={{
+                  title: '重新轉一次',
+                  onPress: onRespin,
+                  variant: 'outline',
+                  icon: <Dices size={20} color={theme.colors.primary} />,
+                }}
+                rightButton={{
+                  title: '就吃這家！',
+                  onPress: onClose,
+                  variant: 'primary',
+                }}
+              />
             </View>
           </ScrollView>
         </View>
@@ -175,67 +152,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: theme.colors.text.secondary,
   },
-  image: {
-    width: '100%',
-    height: 120,
-    backgroundColor: theme.colors.border,
-    borderRadius: theme.borderRadius.lg,
-    marginHorizontal: theme.spacing.md,
-    width: `100% - ${theme.spacing.md * 2}px`,
-    alignSelf: 'center',
-  },
-  infoContainer: {
-    padding: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  restaurantName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.colors.text.primary,
-    flex: 1,
-    letterSpacing: 0.5,
-  },
-  favoriteIcon: {
-    fontSize: 28,
-    marginLeft: theme.spacing.sm,
-  },
-  detailsContainer: {
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.sm,
-  },
-  label: {
-    fontSize: 16,
-    color: theme.colors.text.secondary,
-  },
-  value: {
-    fontSize: 16,
-    color: theme.colors.text.primary,
-    fontWeight: '600',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  price: {
-    color: theme.colors.primary,
+  restaurantInfoWrapper: {
+    overflow: 'hidden',
   },
   addressContainer: {
+    paddingHorizontal: theme.spacing.md,
     marginBottom: theme.spacing.md,
   },
   addressLabelContainer: {
@@ -250,52 +171,12 @@ const styles = StyleSheet.create({
   },
   address: {
     fontSize: 16,
-    color: theme.colors.text.primary,
+    color: theme.colors.primary,
     lineHeight: 22,
+    textDecorationLine: 'underline',
   },
   buttonContainer: {
-    flexDirection: 'row',
     padding: theme.spacing.lg,
     paddingTop: 0,
-    gap: theme.spacing.md,
-  },
-  respinButton: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    paddingVertical: theme.spacing.md + 2,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-  },
-  respinButtonText: {
-    fontSize: 16,
-    color: theme.colors.primary,
-    fontWeight: '700',
-  },
-  confirmButton: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
-    paddingVertical: theme.spacing.md + 2,
-    borderRadius: theme.borderRadius.lg,
-    alignItems: 'center',
-    shadowColor: theme.colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  confirmButtonText: {
-    fontSize: 16,
-    color: theme.colors.surface,
-    fontWeight: '700',
   },
 });

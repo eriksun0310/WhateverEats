@@ -11,7 +11,7 @@ import {
 import { X } from 'lucide-react-native';
 import { theme } from '../../constants/theme';
 import { FilterButton } from '../../components/FilterButton';
-import Button from '../../components/Button';
+import { DualButtonGroup } from '../../components/DualButtonGroup';
 
 const { height } = Dimensions.get('window');
 
@@ -116,17 +116,17 @@ export default function FilterBottomSheet({
           </ScrollView>
           
           <View style={styles.modalFooter}>
-            <Button
-              title="清除全部"
-              variant="outline"
-              onPress={onClear}
-              containerStyle={{ flex: 1, marginRight: theme.spacing.xs }}
-            />
-            <Button
-              title="套用"
-              variant="primary"
-              onPress={handleApply}
-              containerStyle={{ flex: 1, marginLeft: theme.spacing.xs }}
+            <DualButtonGroup
+              leftButton={{
+                title: '清除全部',
+                onPress: onClear,
+                variant: 'outline',
+              }}
+              rightButton={{
+                title: '套用',
+                onPress: handleApply,
+                variant: 'primary',
+              }}
             />
           </View>
         </View>
@@ -191,7 +191,6 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.lg,
   },
   modalFooter: {
-    flexDirection: 'row',
     padding: theme.spacing.md,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
