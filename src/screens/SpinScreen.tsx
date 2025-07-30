@@ -87,6 +87,11 @@ export default function SpinScreen() {
     setShowConfirm(true);
   };
 
+  const handleCloseResult = () => {
+    setShowResult(false);
+    setSelectedRestaurant(null);
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
@@ -152,9 +157,10 @@ export default function SpinScreen() {
       <RestaurantResultModal
         visible={showResult}
         restaurant={selectedRestaurant}
-        onClose={handleConfirmRestaurant}
+        onClose={handleCloseResult}
         onRespin={handleRespin}
         onToggleFavorite={handleToggleFavorite}
+        onConfirm={handleConfirmRestaurant}
       />
 
       <RestaurantConfirmModal

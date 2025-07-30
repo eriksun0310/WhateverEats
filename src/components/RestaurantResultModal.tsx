@@ -22,6 +22,7 @@ interface RestaurantResultModalProps {
   onClose: () => void;
   onRespin: () => void;
   onToggleFavorite?: () => void;
+  onConfirm?: () => void;
 }
 
 export default function RestaurantResultModal({
@@ -30,6 +31,7 @@ export default function RestaurantResultModal({
   onClose,
   onRespin,
   onToggleFavorite,
+  onConfirm,
 }: RestaurantResultModalProps) {
   if (!restaurant) return null;
 
@@ -95,7 +97,7 @@ export default function RestaurantResultModal({
                 }}
                 rightButton={{
                   title: '就吃這家！',
-                  onPress: onClose,
+                  onPress: onConfirm || onClose,
                   variant: 'primary',
                 }}
               />
