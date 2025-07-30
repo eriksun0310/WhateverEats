@@ -1,13 +1,24 @@
-import React, { useRef, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Animated,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSequence,
+  withSpring,
+  runOnJS,
+  Easing,
+  interpolate,
+  withDelay,
+} from 'react-native-reanimated';
 import { theme } from '../constants/theme';
+import { vibrationManager } from '../services/vibrationManager';
 
 const { width } = Dimensions.get('window');
 const WHEEL_SIZE = width * 0.75;
@@ -19,38 +30,97 @@ interface SpinWheelProps {
 }
 
 export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: SpinWheelProps) {
-  const spinValue = useRef(new Animated.Value(0)).current;
+  const rotation = useSharedValue(0);
+  const pointerScale = useSharedValue(1);
+  const wheelScale = useSharedValue(1);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   
+  // 初始化震動系統
+  useEffect(() => {
+    vibrationManager.initialize();
+  }, []);
+  
+  // 不需要轉盤過程中的震動
+  
+  // 創建完成回調函數
+  const handleSpinComplete = (selectedIndex: number) => {
+    setSelectedIndex(selectedIndex);
+    vibrationManager.playSpinResult();
+    onSpinComplete();
+  };
+
   const spin = () => {
     if (isSpinning) return;
     
     onStartSpin();
     
-    // 重置動畫值
-    spinValue.setValue(0);
+    // 播放開始震動
+    vibrationManager.playSpinStart();
     
-    // 隨機旋轉圈數（3-5圈）+ 隨機角度
-    const randomRotations = 3 + Math.random() * 2;
+    // 重置動畫值
+    rotation.value = 0;
+    wheelScale.value = 1;
+    setSelectedIndex(null);
+    
+    // 隨機旋轉圈數（4-6圈）+ 隨機角度
+    const randomRotations = 4 + Math.random() * 2;
     const randomAngle = Math.random() * 360;
     const totalRotation = randomRotations * 360 + randomAngle;
     
-    Animated.timing(spinValue, {
-      toValue: totalRotation,
-      duration: 3000,
-      useNativeDriver: true,
-    }).start(() => {
-      onSpinComplete();
+    // 計算最終停留的扇形索引
+    const segments = 8;
+    const segmentAngle = 360 / segments;
+    const finalAngle = totalRotation % 360;
+    const selectedSegmentIndex = Math.floor((360 - finalAngle) / segmentAngle) % segments;
+    
+    // 指針彈跳動畫
+    pointerScale.value = withSequence(
+      withTiming(0.8, { duration: 200 }),
+      withSpring(1, { damping: 8, stiffness: 200 })
+    );
+    
+    // 轉盤縮放動畫
+    wheelScale.value = withSequence(
+      withTiming(0.95, { duration: 150 }),
+      withTiming(1, { duration: 150 })
+    );
+    
+    // 主旋轉動畫
+    rotation.value = withTiming(totalRotation, {
+      duration: 4000,
+      easing: Easing.out(Easing.cubic),
     });
+    
+    // 使用 setTimeout 處理完成邏輯
+    setTimeout(() => {
+      // 指針最終彈跳
+      pointerScale.value = withSequence(
+        withTiming(1.3, { duration: 100 }),
+        withSpring(1, { damping: 6, stiffness: 300 })
+      );
+      
+      // 執行完成回調
+      handleSpinComplete(selectedSegmentIndex);
+    }, 4100); // 略晚於動畫完成時間
   };
 
-  const spinInterpolate = spinValue.interpolate({
-    inputRange: [0, 360],
-    outputRange: ['0deg', '360deg'],
+  const wheelAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: `${rotation.value}deg` },
+        { scale: wheelScale.value }
+      ],
+    };
   });
-
-  const animatedStyle = {
-    transform: [{ rotate: spinInterpolate }],
-  };
+  
+  const pointerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { rotate: '180deg' },
+        { scale: pointerScale.value }
+      ],
+    };
+  });
 
   // 分段顏色 - 使用舒適且有層次的配色
   const segments = [
@@ -67,11 +137,13 @@ export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: S
   return (
     <View style={styles.container}>
       <View style={styles.wheelContainer}>
-        <Animated.View style={[styles.wheel, animatedStyle]}>
+        <Animated.View style={[styles.wheel, wheelAnimatedStyle]}>
           {segments.map((segment, index) => {
             const angle = (360 / segments.length) * index;
+            const isSelected = selectedIndex === index;
+            
             return (
-              <View
+              <Animated.View
                 key={index}
                 style={[
                   styles.segment,
@@ -81,17 +153,22 @@ export default function SpinWheel({ onSpinComplete, isSpinning, onStartSpin }: S
                       { rotate: `${angle}deg` },
                       { translateX: WHEEL_SIZE / 2 },
                     ],
+                    opacity: isSelected ? 1 : (selectedIndex !== null ? 0.6 : 1),
                   },
                 ]}
-              />
+              >
+                {isSelected && (
+                  <View style={styles.selectedOverlay} />
+                )}
+              </Animated.View>
             );
           })}
         </Animated.View>
         
         {/* 指針 */}
-        <View style={styles.pointer}>
+        <Animated.View style={[styles.pointer, pointerAnimatedStyle]}>
           <View style={styles.pointerTriangle} />
-        </View>
+        </Animated.View>
       </View>
 
       <TouchableOpacity
@@ -194,5 +271,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  selectedOverlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: WHEEL_SIZE / 4,
   },
 });
