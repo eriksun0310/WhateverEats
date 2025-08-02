@@ -89,12 +89,16 @@ export default function ExploreScreen() {
       </View>
 
       {/* 篩選條件顯示 */}
-      <ActiveFilters
-        selectedDistance={selectedDistance}
-        selectedCuisineTypes={selectedCuisineTypes}
-        activeFiltersCount={activeFiltersCount}
-        onPress={() => setShowFilters(true)}
-      />
+      <View>
+            <ActiveFilters
+              selectedDistance={selectedDistance}
+              selectedCuisineTypes={selectedCuisineTypes}
+              activeFiltersCount={activeFiltersCount}
+              onPress={() => setShowFilters(true)}
+            />
+
+      </View>
+     
 
       <FilterBottomSheet
         visible={showFilters}
@@ -132,12 +136,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: theme.spacing.sm,
-    // backgroundColor: theme.colors.surface,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: theme.colors.background,
   },
   title: {
     fontSize: 28,
